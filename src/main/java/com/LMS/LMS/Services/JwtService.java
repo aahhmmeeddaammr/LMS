@@ -50,14 +50,21 @@ public class JwtService {
         return Jwts.builder().setClaims(claims).setIssuedAt(new Date(System.currentTimeMillis())).setExpiration(new Date(System.currentTimeMillis() + 1000*60*24)).signWith(getSignInKey() , SignatureAlgorithm.HS256).compact();
     }
 
-    public boolean validateJwtToken(String token , UserDetails userDetails) {
-        String userEmail = ExtractUserEmailFromJWT(token);
-        return userEmail.equals(((User)userDetails).getEmail()) && !IsTokenExpired(token);
+    public boolean validateJwtToken(String token, UserDetails userDetails) {
+        try {
+            String userEmail = ExtractUserEmailFromJWT(token);
+            return userEmail.equals(((User) userDetails).getEmail()) && !IsTokenExpired(token);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid JWT token", e);
+        }
     }
 
-    private boolean IsTokenExpired(String token) {
-
-        return ExtractExpristion(token).before(new Date());
+    private boolean IsTokenExpired(String token) throws IllegalArgumentException {
+        Date expirationDate = ExtractExpristion(token);
+        if (expirationDate.before(new Date())) {
+            throw new IllegalArgumentException("Expired Token: The token has already expired.");
+        }
+        return false; // Token is valid, not expired
     }
 
     private Date ExtractExpristion(String token) {

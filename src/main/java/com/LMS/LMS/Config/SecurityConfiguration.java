@@ -26,7 +26,7 @@ public class SecurityConfiguration {
         http.csrf(csrf -> csrf.disable()) // Disable CSRF for stateless authentication
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers("/api/v1/course/**").hasRole("ROLE_ADMIN")
+                        .requestMatchers("/api/v1/course/**").hasRole("ROLE_Student")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
