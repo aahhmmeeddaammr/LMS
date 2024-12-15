@@ -9,7 +9,7 @@ import java.util.List;
 @Table
 public class Assignment {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public int id;
     @Column
     public String title;

@@ -28,11 +28,14 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/v1/auth/register").hasRole("ROLE_ADMIN")
                         .requestMatchers("/api/v1/auth/login").permitAll()
                         .requestMatchers("/api/v1/course/add-course").hasRole("ROLE_Instructor")
-                        .requestMatchers("/api/v1/course").permitAll()
+                        .requestMatchers("/api/v1/course/add-lesson").hasRole("ROLE_Instructor")
+                        .requestMatchers("/api/v1/course/enroll").hasRole("ROLE_Student")
+                        .requestMatchers("/api/v1/course/attend-lesson").hasRole("ROLE_Student")
+                        .requestMatchers("/api/v1/course/**").hasAnyRole("ROLE_Instructor" , "ROLE_Student" , "ROLE_ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Stateless session management
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

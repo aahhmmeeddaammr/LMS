@@ -7,17 +7,21 @@ import java.util.Date;
 @Table
 public class Lesson {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public int id;
+
     @Column
     public String title;
+
     @Column
     public String content;
+
     @Column
     public Date date = new Date();
+
     @Column
     public String OTP;
+
     @ManyToOne
-    @JoinColumn
     public Course course;
 }

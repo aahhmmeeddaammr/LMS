@@ -7,7 +7,7 @@ import java.util.List;
 @Table
 public class Course {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public int id;
 
     @Column
@@ -20,8 +20,7 @@ public class Course {
     public int duration;
 
     @ManyToOne
-    @JoinColumn
-    public Instructor instructor; // ins_id
+    public Instructor instructor;
 
     @OneToMany(mappedBy = "course")
     public List<Lesson> lessons;
@@ -29,7 +28,7 @@ public class Course {
     @OneToMany(mappedBy = "course")
     public List<MediaFile> files;
 
-    @ManyToMany
+    @ManyToMany(mappedBy = "courses")
     public List<Student> students;
 
     @OneToMany(mappedBy = "course")
@@ -59,7 +58,7 @@ public class Course {
         this.duration = duration;
     }
 
-    public User getInstructor() {
+    public Instructor getInstructor() {
         return instructor;
     }
 

@@ -12,7 +12,7 @@ import java.util.List;
 @MappedSuperclass
 public  class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected int id;
     protected String name;
     protected String password;

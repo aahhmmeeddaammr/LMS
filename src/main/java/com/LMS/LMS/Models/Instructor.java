@@ -1,5 +1,6 @@
 package com.LMS.LMS.Models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -18,7 +19,9 @@ public class Instructor extends User  implements UserDetails {
     public Instructor() {
         role = Role.ROLE_Instructor;
     }
+
     @OneToMany(mappedBy = "instructor")
+    @JsonIgnore
     private List<Course> courses = new ArrayList<Course>();
 
     public List<Course> getCourses() {

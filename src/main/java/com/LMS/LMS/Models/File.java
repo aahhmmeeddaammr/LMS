@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 @MappedSuperclass
 public class File {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public int id;
     @Column(unique=true)
     public String FilePath;
