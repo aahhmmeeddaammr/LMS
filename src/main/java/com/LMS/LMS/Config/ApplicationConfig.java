@@ -1,31 +1,39 @@
 package com.LMS.LMS.Config;
 
-import com.LMS.LMS.Repositories.UserRepository;
+import com.LMS.LMS.Models.User;
+import com.LMS.LMS.Repositories.AdminRepository;
+import com.LMS.LMS.Repositories.InstructorRepository;
+import com.LMS.LMS.Repositories.StudentRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.core.GrantedAuthorityDefaults;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Optional;
 
 @Configuration
 public class ApplicationConfig {
 
-    UserRepository UserRepository;
-    public ApplicationConfig(UserRepository UserRepository) {
-        this.UserRepository = UserRepository;
+    private final AdminRepository adminRepository;
+    private final InstructorRepository instructorRepository;
+    private final StudentRepository studentRepository;
+    public ApplicationConfig( AdminRepository adminRepository, InstructorRepository instructorRepository, StudentRepository studentRepository) {
+        this.adminRepository = adminRepository;
+        this.instructorRepository = instructorRepository;
+        this.studentRepository = studentRepository;
     }
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> {
             try {
-                return UserRepository.findByEmail(username).orElseThrow(() -> new IllegalAccessException());
+                return (UserDetails) findUserByEmail(username).orElseThrow(() -> new IllegalAccessException());
             } catch (IllegalAccessException e) {
                 throw new RuntimeException("Invalid Email");
             }
@@ -49,5 +57,13 @@ public class ApplicationConfig {
     @Bean
     public GrantedAuthorityDefaults grantedAuthorityDefaults() {
         return new GrantedAuthorityDefaults("");
+    }
+
+    private Optional<User> findUserByEmail(String email) {
+        Optional<User> user = studentRepository.findByEmail(email);
+        if (user.isPresent()) return user;
+        user = instructorRepository.findByEmail(email);
+        if (user.isPresent()) return user;
+        return adminRepository.findByEmail(email);
     }
 }

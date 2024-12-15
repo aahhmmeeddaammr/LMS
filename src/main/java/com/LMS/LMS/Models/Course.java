@@ -1,25 +1,102 @@
 package com.LMS.LMS.Models;
 import jakarta.persistence.*;
+
+import java.util.List;
+
 @Entity
 @Table
 public class Course {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     public int id;
+
     @Column
-    public String name;
-    public Course(){
-    }
-    public Course(int id, String name){
-        this.id = id;
-        this.name = name;
-    }
-    public String getName() {
-        return name;
+    public String title;
+
+    @Column
+    public String description;
+
+    @Column
+    public int duration;
+
+    @ManyToOne
+    @JoinColumn
+    public Instructor instructor; // ins_id
+
+    @OneToMany(mappedBy = "course")
+    public List<Lesson> lessons;
+
+    @OneToMany(mappedBy = "course")
+    public List<MediaFile> files;
+
+    @ManyToMany
+    public List<Student> students;
+
+    @OneToMany(mappedBy = "course")
+    List<Assignment> assignments;
+
+    public String getTitle() {
+        return title;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public int getDuration() {
+        return duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
+    public User getInstructor() {
+        return instructor;
+    }
+
+    public void setInstructor(Instructor instructor) {
+        this.instructor = instructor;
+    }
+
+    public List<Lesson> getLessons() {
+        return lessons;
+    }
+
+    public void setLessons(List<Lesson> lessons) {
+        this.lessons = lessons;
+    }
+
+    public List<MediaFile> getFiles() {
+        return files;
+    }
+
+    public void setFiles(List<MediaFile> files) {
+        this.files = files;
+    }
+
+    public List<Student> getStudents() {
+        return students;
+    }
+
+    public void setStudents(List<Student> students) {
+        this.students = students;
+    }
+
+    public List<Assignment> getAssignments() {
+        return assignments;
+    }
+
+    public void setAssignments(List<Assignment> assignments) {
+        this.assignments = assignments;
     }
 
     public int getId() {

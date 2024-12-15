@@ -23,7 +23,7 @@ public class JwtService {
         return claims.get("email", String.class);
     }
 
-    private Claims ExtractClaimsFromJWT(String token) {
+    public Claims ExtractClaimsFromJWT(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSignInKey())
                 .build()
@@ -43,8 +43,7 @@ public class JwtService {
         if(user.getRole() == null){
             claims.put("role", "Student");
         }else{
-
-        claims.put("role" , user.getRole().name());
+            claims.put("role" , user.getRole().name());
         }
         claims.put("id" , user.getId());
         return Jwts.builder().setClaims(claims).setIssuedAt(new Date(System.currentTimeMillis())).setExpiration(new Date(System.currentTimeMillis() + 1000*60*24)).signWith(getSignInKey() , SignatureAlgorithm.HS256).compact();
@@ -71,4 +70,5 @@ public class JwtService {
         Claims claims = ExtractClaimsFromJWT(token);
         return  claims.getExpiration();
     }
+
 }
