@@ -32,10 +32,13 @@ public class Course {
     public List<Student> students;
 
     @OneToMany(mappedBy = "course")
-    List<Assignment> assignments;
+    public List<Assignment> assignments;
 
-    @OneToMany
-    List<Question> questions;
+    @OneToOne
+    public QuestionBank questionBank;
+
+    @OneToMany(mappedBy = "course")
+    public List<Quiz> quizzes;
 
     public String getTitle() {
         return title;

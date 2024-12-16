@@ -69,7 +69,7 @@ public class CourseController {
         int ID = Claims.get("id", Integer.class);
         return ResponseEntity.ok(courseService.attendLesson(params, ID));
     }
-    @PostMapping("/add-Material/{id}")
+    @PostMapping("/add-material/{id}")
     public ResponseEntity<APIResponse> addMaterial(@PathVariable int id,@RequestParam("file") MultipartFile file ) throws Exception {
         return ResponseEntity.ok(courseService.addMaterial(file, id));
     }

@@ -10,14 +10,20 @@ public class Quiz {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
     private String title;
+
     private double Score;
+
     private double Duration;
+
     private Date StartDate;
-    @OneToMany
-    private List<Question> questions;
+
+    @OneToMany(mappedBy = "quiz")
+    public List<Question> questions;
+
     @ManyToOne
-    private Course course;
+    public Course course;
 
     public int getId() {
         return id;

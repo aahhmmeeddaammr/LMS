@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "question_bank")
 public class QuestionBank {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -14,10 +13,9 @@ public class QuestionBank {
 
     private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "course_id")
-    private Course course;
+    @OneToOne(mappedBy = "questionBank")
+    public Course course;
 
-    @OneToMany(mappedBy = "questionBank", cascade = CascadeType.ALL)
-    private List<Question> questions;
+    @OneToMany(mappedBy = "questionBank")
+    public List<Question> questions;
 }

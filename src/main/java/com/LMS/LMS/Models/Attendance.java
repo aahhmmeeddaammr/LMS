@@ -16,9 +16,6 @@ public class Attendance {
     @JoinColumn(name = "lessonId", referencedColumnName = "id")
     private Lesson lesson;
 
-    @Column
-    private int attendanceNumber;
-
     public Student getStudent() {
         return student;
     }
@@ -33,13 +30,5 @@ public class Attendance {
 
     public void setLesson(Lesson lesson) {
         this.lesson = lesson;
-    }
-
-    public int getAttendanceNumber() {
-        return attendanceNumber;
-    }
-
-    public void setAttendanceNumber(int attendanceNumber) {
-        this.attendanceNumber = attendanceNumber;
     }
 }

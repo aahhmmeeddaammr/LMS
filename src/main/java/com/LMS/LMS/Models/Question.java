@@ -24,6 +24,9 @@ public class Question {
     @ManyToOne
     private Quiz quiz;
 
+    @ManyToOne
+    private QuestionBank questionBank;
+
     public int getId() {
         return id;
     }

@@ -21,8 +21,9 @@ public class CourseService {
     private final StudentRepository studentRepository;
     private final LessonRepository lessonRepository;
     private final AttendanceRepository attendanceRepository;
-    private final  ModelFileRepository modelFileRepository;
+    private final ModelFileRepository modelFileRepository;
     private final UploadFileService uploadFileService;
+
     public CourseService(CourseRepository courseRepository, InstructorRepository instructorRepository, StudentRepository studentRepository, LessonRepository lessonRepository, AttendanceRepository attendanceRepository, ModelFileRepository modelFileRepository, UploadFileService uploadFileService) {
         this.courseRepository = courseRepository;
         this.instructorRepository = instructorRepository;
@@ -107,16 +108,9 @@ public class CourseService {
         }
         try {
             Student student = studentRepository.findById(StdId).orElse(null);
-            AttendancePK pk = new AttendancePK(student, lesson);
-            Attendance attendance = attendanceRepository.findById(pk).orElse(null);
-            if (attendance == null) {
-                attendance = new Attendance();
-                attendance.setStudent(student);
-                attendance.setLesson(lesson);
-                attendance.setAttendanceNumber(1);
-            } else {
-                attendance.setAttendanceNumber(attendance.getAttendanceNumber() + 1);
-            }
+            Attendance attendance = new Attendance();
+            attendance.setStudent(student);
+            attendance.setLesson(lesson);
             attendanceRepository.save(attendance);
             return new GetResponse<>(200, "Lesson Attended Successfully");
         } catch (Exception e) {
@@ -124,7 +118,7 @@ public class CourseService {
         }
     }
 
-    public APIResponse addMaterial(MultipartFile file , int Course_id){
+    public APIResponse addMaterial(MultipartFile file, int Course_id) {
         String NewFilePathName = uploadFileService.uploadFile(file);
         MediaFile NewFile = new MediaFile();
         Course course = courseRepository.findById(Course_id).orElse(null);
@@ -132,7 +126,7 @@ public class CourseService {
             throw new IllegalArgumentException("Course not found");
         }
         NewFile.course = course;
-        NewFile.FilePath= NewFilePathName;
+        NewFile.FilePath = NewFilePathName;
         course.getFiles().add(NewFile);
         courseRepository.save(course);
         modelFileRepository.save(NewFile);
