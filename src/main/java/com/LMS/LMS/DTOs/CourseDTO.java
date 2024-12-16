@@ -1,6 +1,7 @@
 package com.LMS.LMS.DTOs;
 
 import com.LMS.LMS.Models.Course;
+import com.LMS.LMS.Models.MediaFile;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public class CourseDTO {
     public List<LessonDTO> lessons;
 
     public List<StudentDTO> students;
+    public List<MediaFileDTO> files;
 
     public CourseDTO(Course course, boolean includeStudents) {
         this.id = course.getId();
@@ -30,5 +32,6 @@ public class CourseDTO {
         this.lessons = course.getLessons().stream().map(LessonDTO::new).collect(Collectors.toList());
         this.instructor = new InstructorDTO(course.getInstructor());
         this.students = includeStudents ? course.getStudents().stream().map(StudentDTO::new).collect(Collectors.toList()) : null;
+        this.files = course.getFiles().stream().map(MediaFileDTO::new).collect(Collectors.toList());
     }
 }

@@ -34,6 +34,9 @@ public class Course {
     @OneToMany(mappedBy = "course")
     List<Assignment> assignments;
 
+    @OneToMany
+    List<Question> questions;
+
     public String getTitle() {
         return title;
     }

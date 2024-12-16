@@ -10,6 +10,7 @@ import com.LMS.LMS.DTOs.CourseDTO;
 import com.LMS.LMS.Models.*;
 import com.LMS.LMS.Repositories.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.stream.Collectors;
 
@@ -20,13 +21,16 @@ public class CourseService {
     private final StudentRepository studentRepository;
     private final LessonRepository lessonRepository;
     private final AttendanceRepository attendanceRepository;
-
-    public CourseService(CourseRepository courseRepository, InstructorRepository instructorRepository, StudentRepository studentRepository, LessonRepository lessonRepository, AttendanceRepository attendanceRepository) {
+    private final  ModelFileRepository modelFileRepository;
+    private final UploadFileService uploadFileService;
+    public CourseService(CourseRepository courseRepository, InstructorRepository instructorRepository, StudentRepository studentRepository, LessonRepository lessonRepository, AttendanceRepository attendanceRepository, ModelFileRepository modelFileRepository, UploadFileService uploadFileService) {
         this.courseRepository = courseRepository;
         this.instructorRepository = instructorRepository;
         this.studentRepository = studentRepository;
         this.lessonRepository = lessonRepository;
         this.attendanceRepository = attendanceRepository;
+        this.modelFileRepository = modelFileRepository;
+        this.uploadFileService = uploadFileService;
     }
 
     public APIResponse addCourse(AddCourseParams course, int id) {
@@ -118,6 +122,21 @@ public class CourseService {
         } catch (Exception e) {
             throw new Exception("Internal Server Error");
         }
+    }
+
+    public APIResponse addMaterial(MultipartFile file , int Course_id){
+        String NewFilePathName = uploadFileService.uploadFile(file);
+        MediaFile NewFile = new MediaFile();
+        Course course = courseRepository.findById(Course_id).orElse(null);
+        if (course == null) {
+            throw new IllegalArgumentException("Course not found");
+        }
+        NewFile.course = course;
+        NewFile.FilePath= NewFilePathName;
+        course.getFiles().add(NewFile);
+        courseRepository.save(course);
+        modelFileRepository.save(NewFile);
+        return new GetResponse<>(200, new CourseDTO(course, false));
     }
 
     private String GenerateOTP() {

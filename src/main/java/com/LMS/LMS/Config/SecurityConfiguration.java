@@ -25,12 +25,14 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable()) // Disable CSRF for stateless authentication
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/register").hasRole("ROLE_ADMIN")
+                        .requestMatchers("/uploads/**").permitAll()
+                        .requestMatchers("/api/v1/auth/register").permitAll()
                         .requestMatchers("/api/v1/auth/login").permitAll()
                         .requestMatchers("/api/v1/course/add-course").hasRole("ROLE_Instructor")
                         .requestMatchers("/api/v1/course/add-lesson").hasRole("ROLE_Instructor")
                         .requestMatchers("/api/v1/course/enroll").hasRole("ROLE_Student")
                         .requestMatchers("/api/v1/course/attend-lesson").hasRole("ROLE_Student")
+                        .requestMatchers("api/v1/course/add-Material/**").hasRole("ROLE_Instructor")
                         .requestMatchers("/api/v1/course/**").hasAnyRole("ROLE_Instructor" , "ROLE_Student" , "ROLE_ADMIN")
                         .anyRequest().authenticated()
                 )

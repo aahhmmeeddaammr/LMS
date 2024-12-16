@@ -10,6 +10,7 @@ import com.LMS.LMS.Services.CourseService;
 import com.LMS.LMS.Services.JwtService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @RestController
@@ -67,5 +68,9 @@ public class CourseController {
         var Claims = jwtService.ExtractClaimsFromJWT(token);
         int ID = Claims.get("id", Integer.class);
         return ResponseEntity.ok(courseService.attendLesson(params, ID));
+    }
+    @PostMapping("/add-Material/{id}")
+    public ResponseEntity<APIResponse> addMaterial(@PathVariable int id,@RequestParam("file") MultipartFile file ) throws Exception {
+        return ResponseEntity.ok(courseService.addMaterial(file, id));
     }
 }
