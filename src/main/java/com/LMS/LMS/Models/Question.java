@@ -6,26 +6,25 @@ import java.util.List;
 
 @Entity
 public class Question {
+
+    public Question() {
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private String question;
-
-    @OneToOne
-    private Answer correct_answer;
-
-    @OneToMany
-    private List<Answer> wrong_answer;
-
     @Enumerated(EnumType.STRING)
-    private QuestionType question_type;
+    private QuestionType questionType;
+
+    @Column
+    private String questionTitle;
+
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
+    private List<Answer> answers;
 
     @ManyToOne
-    private Quiz quiz;
-
-    @ManyToOne
-    private QuestionBank questionBank;
+    private Course course;
 
     public int getId() {
         return id;
@@ -35,35 +34,35 @@ public class Question {
         this.id = id;
     }
 
-    public String getQuestion() {
-        return question;
+    public QuestionType getQuestionType() {
+        return questionType;
     }
 
-    public void setQuestion(String question) {
-        this.question = question;
+    public void setQuestionType(QuestionType questionType) {
+        this.questionType = questionType;
     }
 
-    public Answer getCorrect_answer() {
-        return correct_answer;
+    public String getQuestionTitle() {
+        return questionTitle;
     }
 
-    public void setCorrect_answer(Answer correct_answer) {
-        this.correct_answer = correct_answer;
+    public void setQuestionTitle(String questionTitle) {
+        this.questionTitle = questionTitle;
     }
 
-    public List<Answer> getWrong_answer() {
-        return wrong_answer;
+    public List<Answer> getAnswers() {
+        return answers;
     }
 
-    public void setWrong_answer(List<Answer> wrong_answer) {
-        this.wrong_answer = wrong_answer;
+    public void setAnswers(List<Answer> answers) {
+        this.answers = answers;
     }
 
-    public QuestionType getQuestion_type() {
-        return question_type;
+    public Course getCourse() {
+        return course;
     }
 
-    public void setQuestion_type(QuestionType question_type) {
-        this.question_type = question_type;
+    public void setCourse(Course course) {
+        this.course = course;
     }
 }

@@ -5,17 +5,17 @@ import jakarta.persistence.*;
 @Entity
 @IdClass(AttendancePK.class)
 public class Attendance {
-
     @Id
     @ManyToOne
-    @JoinColumn(name = "studentId", referencedColumnName = "id")
+    @JoinColumn(name = "student_id", nullable = false)
     private Student student;
 
     @Id
     @ManyToOne
-    @JoinColumn(name = "lessonId", referencedColumnName = "id")
+    @JoinColumn(name = "lesson_id", nullable = false)
     private Lesson lesson;
 
+    // Getters and setters
     public Student getStudent() {
         return student;
     }

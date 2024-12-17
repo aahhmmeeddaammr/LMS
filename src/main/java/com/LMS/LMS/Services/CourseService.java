@@ -37,14 +37,14 @@ public class CourseService {
     public APIResponse addCourse(AddCourseParams course, int id) {
         try {
             Course NewCourse = new Course();
-            NewCourse.title = course.Title;
-            NewCourse.description = course.Description;
-            NewCourse.duration = course.Duration;
+            NewCourse.setTitle(course.Title);
+            NewCourse.setDescription(course.Description);
+            NewCourse.setDuration(course.Duration);
             Instructor instructor = instructorRepository.findById(id).orElse(null);
             if (instructor == null) {
                 throw new IllegalArgumentException("Instructor not found");
             }
-            NewCourse.instructor = instructor;
+            NewCourse.setInstructor(instructor);
             courseRepository.save(NewCourse);
             return new GetResponse<>(200, course);
         } catch (Exception e) {
@@ -125,7 +125,7 @@ public class CourseService {
         if (course == null) {
             throw new IllegalArgumentException("Course not found");
         }
-        NewFile.course = course;
+        NewFile.setCourse(course);
         NewFile.FilePath = NewFilePathName;
         course.getFiles().add(NewFile);
         courseRepository.save(course);

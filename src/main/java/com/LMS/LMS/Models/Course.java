@@ -1,44 +1,101 @@
 package com.LMS.LMS.Models;
+
 import jakarta.persistence.*;
 
 import java.util.List;
 
 @Entity
-@Table
 public class Course {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public int id;
+    private int id;
+
+    @Column(nullable = false)
+    private String title;
 
     @Column
-    public String title;
+    private String description;
 
-    @Column
-    public String description;
-
-    @Column
-    public int duration;
+    @Column(nullable = false)
+    private int duration;
 
     @ManyToOne
-    public Instructor instructor;
+    @JoinColumn(name = "instructor_id", nullable = false)
+    private Instructor instructor;
 
     @OneToMany(mappedBy = "course")
-    public List<Lesson> lessons;
+    private List<Lesson> lessons;
 
     @OneToMany(mappedBy = "course")
-    public List<MediaFile> files;
+    private List<MediaFile> files;
 
     @ManyToMany(mappedBy = "courses")
-    public List<Student> students;
+    private List<Student> students;
 
     @OneToMany(mappedBy = "course")
-    public List<Assignment> assignments;
-
-    @OneToOne
-    public QuestionBank questionBank;
+    private List<Assignment> assignments;
 
     @OneToMany(mappedBy = "course")
-    public List<Quiz> quizzes;
+    private List<Quiz> quizzes;
+
+    @OneToMany(mappedBy = "course")
+    private List<Question> questionBank;
+
+    public List<Lesson> getLessons() {
+        return lessons;
+    }
+
+    public void setLessons(List<Lesson> lessons) {
+        this.lessons = lessons;
+    }
+
+    public List<MediaFile> getFiles() {
+        return files;
+    }
+
+    public void setFiles(List<MediaFile> files) {
+        this.files = files;
+    }
+
+    public List<Student> getStudents() {
+        return students;
+    }
+
+    public List<Question> getQuestionBank() {
+        return questionBank;
+    }
+
+    public void setQuestionBank(List<Question> questionBank) {
+        this.questionBank = questionBank;
+    }
+
+    public void setStudents(List<Student> students) {
+        this.students = students;
+    }
+
+    public List<Assignment> getAssignments() {
+        return assignments;
+    }
+
+    public void setAssignments(List<Assignment> assignments) {
+        this.assignments = assignments;
+    }
+
+    public List<Quiz> getQuizzes() {
+        return quizzes;
+    }
+
+    public void setQuizzes(List<Quiz> quizzes) {
+        this.quizzes = quizzes;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getTitle() {
         return title;
@@ -72,43 +129,4 @@ public class Course {
         this.instructor = instructor;
     }
 
-    public List<Lesson> getLessons() {
-        return lessons;
-    }
-
-    public void setLessons(List<Lesson> lessons) {
-        this.lessons = lessons;
-    }
-
-    public List<MediaFile> getFiles() {
-        return files;
-    }
-
-    public void setFiles(List<MediaFile> files) {
-        this.files = files;
-    }
-
-    public List<Student> getStudents() {
-        return students;
-    }
-
-    public void setStudents(List<Student> students) {
-        this.students = students;
-    }
-
-    public List<Assignment> getAssignments() {
-        return assignments;
-    }
-
-    public void setAssignments(List<Assignment> assignments) {
-        this.assignments = assignments;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 }

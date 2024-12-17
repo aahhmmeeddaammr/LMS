@@ -5,7 +5,6 @@ import com.LMS.LMS.Controllers.ControllerParams.AddCourseParams;
 import com.LMS.LMS.Controllers.ControllerParams.AddLessonParams;
 import com.LMS.LMS.Controllers.ControllerParams.AttendLessonParams;
 import com.LMS.LMS.Controllers.ControllerParams.EnrollParams;
-import com.LMS.LMS.Models.Course;
 import com.LMS.LMS.Services.CourseService;
 import com.LMS.LMS.Services.JwtService;
 import org.springframework.http.ResponseEntity;
@@ -69,8 +68,9 @@ public class CourseController {
         int ID = Claims.get("id", Integer.class);
         return ResponseEntity.ok(courseService.attendLesson(params, ID));
     }
+
     @PostMapping("/add-material/{id}")
-    public ResponseEntity<APIResponse> addMaterial(@PathVariable int id,@RequestParam("file") MultipartFile file ) throws Exception {
+    public ResponseEntity<APIResponse> addMaterial(@PathVariable int id, @RequestParam("file") MultipartFile file) throws Exception {
         return ResponseEntity.ok(courseService.addMaterial(file, id));
     }
 }

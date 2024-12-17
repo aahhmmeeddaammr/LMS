@@ -11,13 +11,18 @@ import java.util.List;
 
 @MappedSuperclass
 public  class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected int id;
+
     protected String name;
+
     protected String password;
+
     @Column(unique = true)
     protected String email;
+
     @Enumerated(EnumType.STRING)
     protected Role role;
 
@@ -51,8 +56,6 @@ public  class User {
     public  String getName(){
         return name;
     }
-
-
 
     public String getPassword() {
         return password;

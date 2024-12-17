@@ -5,18 +5,14 @@ import java.util.Objects;
 
 public class AttendancePK implements Serializable {
 
-    private Student student;  // Use the entity class
-    private Lesson lesson;    // Use the entity class
-
-    // Constructors
-    public AttendancePK() {}
+    private Student student;
+    private Lesson lesson;
 
     public AttendancePK(Student student, Lesson lesson) {
         this.student = student;
         this.lesson = lesson;
     }
 
-    // Getters and Setters
     public Student getStudent() {
         return student;
     }

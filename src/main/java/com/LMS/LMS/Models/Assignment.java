@@ -1,26 +1,37 @@
 package com.LMS.LMS.Models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table
 public class Assignment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public int id;
-    @Column
-    public String title;
-    @Column
-    public double grade;
-    @Column
-    public Date deadline;
+    private int id;
+
+    @Column(nullable = false)
+    private String title;
+
+    @Column(nullable = false)
+    private String description;
+
+    @Column(nullable = false)
+    private double grade;
+
+    @Column(nullable = false)
+    private Date deadline;
+
     @ManyToOne
-    public Course course;
-    @OneToMany(mappedBy = "assignment")
-    List<AssignmentFile> files;
+    @JoinColumn(name = "course_id", nullable = false)
+    private Course course;
+
+    @OneToMany(mappedBy = "assignment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AssignmentFile> files = new ArrayList<>();
 
     public int getId() {
         return id;
@@ -68,5 +79,13 @@ public class Assignment {
 
     public void setFiles(List<AssignmentFile> files) {
         this.files = files;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

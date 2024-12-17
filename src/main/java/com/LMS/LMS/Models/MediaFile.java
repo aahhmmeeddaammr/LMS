@@ -5,5 +5,13 @@ import jakarta.persistence.*;
 @Entity
 public class MediaFile extends File {
     @ManyToOne
-    public Course course;
+    private Course course;
+
+    public Course getCourse() {
+        return course;
+    }
+
+    public void setCourse(Course course) {
+        this.course = course;
+    }
 }

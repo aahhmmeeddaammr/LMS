@@ -11,15 +11,19 @@ public class Quiz {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @Column
     private String title;
 
+    @Column
     private double Score;
 
+    @Column
     private double Duration;
 
+    @Column
     private Date StartDate;
 
-    @OneToMany(mappedBy = "quiz")
+    @ManyToMany
     public List<Question> questions;
 
     @ManyToOne
