@@ -2,6 +2,7 @@ package com.LMS.LMS.Models;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -21,7 +22,7 @@ public class Quiz {
     private double Duration;
 
     @Column
-    private Date StartDate;
+    private LocalDateTime StartDate;
 
     @ManyToMany
     public List<Question> questions;
@@ -61,11 +62,11 @@ public class Quiz {
         Duration = duration;
     }
 
-    public Date getStartDate() {
+    public LocalDateTime getStartDate() {
         return StartDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(LocalDateTime startDate) {
         StartDate = startDate;
     }
 

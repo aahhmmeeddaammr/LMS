@@ -1,5 +1,6 @@
 package com.LMS.LMS.Controllers.ControllerParams;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 public class AddQuizParams {
@@ -12,5 +13,5 @@ public class AddQuizParams {
 
     public double duration;
 
-    public Date startDate;
+    public LocalDateTime startDate;
 }

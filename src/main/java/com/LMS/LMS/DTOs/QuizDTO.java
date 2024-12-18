@@ -2,6 +2,7 @@ package com.LMS.LMS.DTOs;
 
 import com.LMS.LMS.Models.Quiz;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class QuizDTO {
 
     public double duration;
 
-    public Date startDate;
+    public LocalDateTime startDate;
 
     public List<QuestionDTO> questions;
 

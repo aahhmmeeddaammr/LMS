@@ -123,9 +123,15 @@ public class AssessmentService {
     }
 
     public APIResponse submitQuiz(SubmitQuizParams params, int id, int stdId) {
+
         Quiz quiz = quizRepository.findById(id).orElse(null);
         if (quiz == null) {
             throw new IllegalArgumentException("Quiz not found");
+        }
+        LocalDateTime currentTime = LocalDateTime.now();
+
+        if (currentTime.isBefore(quiz.getStartDate())) {
+            return new GetResponse<>(400, "Quiz has not started yet. Please wait until the start date.");
         }
         Student student = studentRepository.findById(stdId).orElse(null);
         if (student == null) {
@@ -135,6 +141,16 @@ public class AssessmentService {
             throw new IllegalArgumentException("You have submitted the quiz already");
         }
         double grade = 0;
+        LocalDateTime quizEndTime = quiz.getStartDate().plusMinutes((long)quiz.getDuration());
+        if (currentTime.isAfter(quizEndTime)) {
+            StudentsQuizzes studentsQuizzes = new StudentsQuizzes();
+            studentsQuizzes.setQuiz(quiz);
+            studentsQuizzes.setStudent(student);
+            studentsQuizzes.setGrade(grade);
+            studentQuizzesRepository.save(studentsQuizzes);
+            return new GetResponse<>(400, "Quiz has ended. Submission not allowed. Your Grade Is 0");
+
+        }
         List<Question> questions = quiz.getQuestions();
         double weight = quiz.getScore() / questions.size();
         for (int i = 0; i < questions.size(); i++) {
