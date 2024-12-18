@@ -24,6 +24,7 @@ public class CourseService {
     private final ModelFileRepository modelFileRepository;
     private final UploadFileService uploadFileService;
     private final EmailService emailService;
+
     public CourseService(CourseRepository courseRepository, InstructorRepository instructorRepository, StudentRepository studentRepository, LessonRepository lessonRepository, AttendanceRepository attendanceRepository, ModelFileRepository modelFileRepository, UploadFileService uploadFileService, EmailService emailService) {
         this.courseRepository = courseRepository;
         this.instructorRepository = instructorRepository;
@@ -71,8 +72,11 @@ public class CourseService {
     public APIResponse enrollStudent(int CrsId, int StdId) {
         var course = courseRepository.findById(CrsId).orElse(null);
         var student = studentRepository.findById(StdId).orElse(null);
-        if (course == null || student == null) {
+        if (course == null || student == null ) {
             throw new IllegalArgumentException("Course or student not found");
+        }
+        if(student.getCourses().contains(course)) {
+            throw new IllegalArgumentException("Student already enrolled");
         }
         course.getStudents().add(student);
         student.getCourses().add(course);
@@ -90,11 +94,13 @@ public class CourseService {
         if (student == null) {
             throw new IllegalArgumentException("Student not found");
         }
+        if(!student.getCourses().contains(course)){
+            throw new IllegalArgumentException("Student is not enrolled to this course");
+        }
         Email email = new Email();
         email.setRecipient(student.getEmail());
         email.setSubject("Student Deletion Successfully");
         email.setMsgBody("Student Deletion Successfully");
-//        email.setAttachment("student.png");
         course.getStudents().remove(student);
         student.getCourses().remove(course);
         emailService.sendSimpleMail(email);

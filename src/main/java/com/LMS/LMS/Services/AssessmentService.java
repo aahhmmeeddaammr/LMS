@@ -6,7 +6,6 @@ import com.LMS.LMS.Controllers.ControllerParams.AddAssignmentParams;
 import com.LMS.LMS.Controllers.ControllerParams.AddQuestionsParams;
 import com.LMS.LMS.Controllers.ControllerParams.AddQuizParams;
 import com.LMS.LMS.Controllers.ControllerParams.SubmitQuizParams;
-import com.LMS.LMS.DTOs.CourseDTO;
 import com.LMS.LMS.DTOs.QuizDTO;
 import com.LMS.LMS.Models.*;
 import com.LMS.LMS.Repositories.*;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -30,8 +28,11 @@ public class AssessmentService {
     private final UploadFileService uploadFileService;
     private final AssignmentFileRepository assignmentFileRepository;
     private final AssignmentRepository assignmentRepository;
-    private final  EmailService emailService;
-    public AssessmentService(QuestionRepository questionRepository, AnswerRepository answerRepository, QuizRepository quizRepository, CourseRepository courseRepository, StudentRepository studentRepository, StudentQuizzesRepository studentQuizzesRepository, UploadFileService uploadFileService, AssignmentFileRepository assignmentFileRepository, AssignmentRepository assignmentRepository, EmailService emailService) {
+    private final EmailService emailService;
+    private final StudentAssignmentRepository studentAssignmentRepository;
+    private final SubmittedAssignmentFileRepository submittedAssignmentFileRepository;
+
+    public AssessmentService(QuestionRepository questionRepository, AnswerRepository answerRepository, QuizRepository quizRepository, CourseRepository courseRepository, StudentRepository studentRepository, StudentQuizzesRepository studentQuizzesRepository, UploadFileService uploadFileService, AssignmentFileRepository assignmentFileRepository, AssignmentRepository assignmentRepository, EmailService emailService, StudentAssignmentRepository studentAssignmentRepository, SubmittedAssignmentFileRepository studentSubmittedAssignmentFileRepository) {
         this.questionRepository = questionRepository;
         this.answerRepository = answerRepository;
         this.quizRepository = quizRepository;
@@ -42,6 +43,8 @@ public class AssessmentService {
         this.assignmentFileRepository = assignmentFileRepository;
         this.assignmentRepository = assignmentRepository;
         this.emailService = emailService;
+        this.studentAssignmentRepository = studentAssignmentRepository;
+        this.submittedAssignmentFileRepository = studentSubmittedAssignmentFileRepository;
     }
 
     public APIResponse createQuestionBank(List<AddQuestionsParams> paramsList, int CrsId) {
@@ -93,7 +96,7 @@ public class AssessmentService {
         if (params.noOfQuestions > course.getQuestionBank().size()) {
             throw new IllegalArgumentException("Number of questions is greater than the number of questions in question bank");
         }
-        List<Student>students= course.getStudents();
+        List<Student> students = course.getStudents();
         for (Student student : students) {
             Email email = new Email();
             email.setRecipient(student.getEmail());
@@ -141,7 +144,7 @@ public class AssessmentService {
             throw new IllegalArgumentException("You have submitted the quiz already");
         }
         double grade = 0;
-        LocalDateTime quizEndTime = quiz.getStartDate().plusMinutes((long)quiz.getDuration());
+        LocalDateTime quizEndTime = quiz.getStartDate().plusMinutes((long) quiz.getDuration());
         if (currentTime.isAfter(quizEndTime)) {
             StudentsQuizzes studentsQuizzes = new StudentsQuizzes();
             studentsQuizzes.setQuiz(quiz);
@@ -191,6 +194,35 @@ public class AssessmentService {
         }
         courseRepository.save(course);
         return new GetResponse<>(200, "Assignment Added Successfully");
+    }
+
+    public APIResponse submitAssignment(List<MultipartFile> files, int assignmentId, int studentId) {
+        Student student = studentRepository.findById(studentId).orElse(null);
+        if (student == null) {
+            throw new IllegalArgumentException("Student not found");
+        }
+        Assignment assignment = assignmentRepository.findById(assignmentId).orElse(null);
+        if (assignment == null) {
+            throw new IllegalArgumentException("Assignment not found");
+        }
+        StudentAssignmentPK pk = new StudentAssignmentPK(student, assignment);
+        StudentAssignment studentAssignment = studentAssignmentRepository.findById(pk).orElse(null);
+        if (studentAssignment != null) {
+            throw new IllegalArgumentException("You have already submitted the assignment");
+        }
+        studentAssignment = new StudentAssignment();
+        studentAssignment.setStudent(student);
+        studentAssignment.setAssignment(assignment);
+        studentAssignmentRepository.save(studentAssignment);
+        for (MultipartFile file : files) {
+            String NewFilePathName = uploadFileService.uploadFile(file);
+            SubmittedAssignmentFile NewFile = new SubmittedAssignmentFile();
+            NewFile.setSubmittedAssignment(studentAssignment);
+            NewFile.FilePath = NewFilePathName;
+            studentAssignment.getFiles().add(NewFile);
+            submittedAssignmentFileRepository.save(NewFile);
+        }
+        return new GetResponse<>(200, "Assignment Submitted Successfully");
     }
 
     private List<Question> GenerateQuiz(int noOfQuestions, List<Question> questions) {

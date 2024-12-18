@@ -58,7 +58,8 @@ public class AssessmentController {
             @RequestParam("grade") double grade,
             @RequestParam("deadline") String deadline,
             @RequestParam("files") List<MultipartFile> files,
-            @PathVariable int id) {
+            @PathVariable int id
+    ) {
 
         AddAssignmentParams params = new AddAssignmentParams();
         params.title = title;
@@ -73,5 +74,13 @@ public class AssessmentController {
         }
 
         return ResponseEntity.ok(assessmentService.addAssignment(params, id, files));
+    }
+
+    @PostMapping("/submit-assignment/{id}")
+    public ResponseEntity<APIResponse> submitAssignment(@RequestParam("files") List<MultipartFile> files , @RequestHeader String Authorization, @PathVariable int id){
+        String token = Authorization.substring(7);
+        var Claims = jwtService.ExtractClaimsFromJWT(token);
+        int stdID = Claims.get("id", Integer.class);
+        return ResponseEntity.ok(assessmentService.submitAssignment(files , id, stdID));
     }
 }
