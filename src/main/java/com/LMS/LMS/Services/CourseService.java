@@ -94,7 +94,6 @@ public class CourseService {
         email.setRecipient(student.getEmail());
         email.setSubject("Student Deletion Successfully");
         email.setMsgBody("Student Deletion Successfully");
-//        email.setAttachment("student.png");
         course.getStudents().remove(student);
         student.getCourses().remove(course);
         emailService.sendSimpleMail(email);
