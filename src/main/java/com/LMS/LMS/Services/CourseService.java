@@ -48,6 +48,16 @@ public class CourseService {
             }
             NewCourse.setInstructor(instructor);
             courseRepository.save(NewCourse);
+
+            var students = studentRepository.findAll();
+            students.forEach(student -> {
+                Email email = new Email();
+                email.setRecipient(student.getEmail());
+                email.setSubject("New Course Added");
+                email.setMsgBody("A new course  '" + course.Title + "' has been added. Check it out!");
+                emailService.sendSimpleMail(email);
+            });
+
             return new GetResponse<>(200, course);
         } catch (Exception e) {
             throw new IllegalArgumentException(e.getMessage());
@@ -82,6 +92,13 @@ public class CourseService {
         student.getCourses().add(course);
         studentRepository.save(student);
         courseRepository.save(course);
+
+        Email email = new Email();
+        email.setRecipient(student.getEmail());
+        email.setSubject("Enrollment Confirmation");
+        email.setMsgBody("You have been successfully enrolled in the course: '" + course.getTitle() + "'.");
+        emailService.sendSimpleMail(email);
+
         return new GetResponse<>(200, "Student Enrolled Successfully");
     }
 
@@ -99,8 +116,8 @@ public class CourseService {
         }
         Email email = new Email();
         email.setRecipient(student.getEmail());
-        email.setSubject("Student Deletion Successfully");
-        email.setMsgBody("Student Deletion Successfully");
+        email.setSubject("Student Deletion");
+        email.setMsgBody("You have been removed from the course: '" + course.getTitle() + "'.");
         course.getStudents().remove(student);
         student.getCourses().remove(course);
         emailService.sendSimpleMail(email);
@@ -124,6 +141,15 @@ public class CourseService {
             course.getLessons().add(lesson);
             courseRepository.save(course);
             lessonRepository.save(lesson);
+
+            course.getStudents().forEach(student -> {
+                Email email = new Email();
+                email.setRecipient(student.getEmail());
+                email.setSubject("New Lesson Added");
+                email.setMsgBody("A new lesson titled '" + lesson.title + "' has been added to the course: '" + course.getTitle() + "'.");
+                emailService.sendSimpleMail(email);
+            });
+
             return new GetResponse<>(200, "Lesson Added Successfully");
         } catch (Exception e) {
             throw new Exception("Internal Server Error");
@@ -159,6 +185,16 @@ public class CourseService {
         course.getFiles().add(NewFile);
         courseRepository.save(course);
         modelFileRepository.save(NewFile);
+
+        course.getStudents().forEach(student -> {
+            Email email = new Email();
+            email.setRecipient(student.getEmail());
+            email.setSubject("New Material Uploaded");
+            email.setMsgBody("New material has been uploaded for the course: '" + course.getTitle() + "'. Check it out!");
+            email.setAttachment(NewFilePathName);
+            emailService.sendMailWithAttachment(email);
+        });
+
         return new GetResponse<>(200, new CourseDTO(course, false));
     }
 

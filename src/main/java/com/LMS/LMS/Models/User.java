@@ -25,7 +25,8 @@ public  class User {
 
     @Enumerated(EnumType.STRING)
     protected Role role;
-
+    protected String phone;
+    protected String address;
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
     }
@@ -84,4 +85,21 @@ public  class User {
     public  String getEmail(){
         return  this.email;
     }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
 }

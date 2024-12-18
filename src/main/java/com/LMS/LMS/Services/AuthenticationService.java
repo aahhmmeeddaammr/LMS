@@ -2,8 +2,10 @@ package com.LMS.LMS.Services;
 
 import com.LMS.LMS.Controllers.ApiResponses.APIResponse;
 import com.LMS.LMS.Controllers.ApiResponses.AuthenticationResponse;
+import com.LMS.LMS.Controllers.ControllerParams.CompleteProfileParams;
 import com.LMS.LMS.Controllers.ControllerParams.LoginParams;
 import com.LMS.LMS.Controllers.ControllerParams.RegisterParams;
+import com.LMS.LMS.DTOs.ProfileDTO;
 import com.LMS.LMS.Models.*;
 import com.LMS.LMS.Repositories.AdminRepository;
 import com.LMS.LMS.Repositories.InstructorRepository;
@@ -13,6 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 
@@ -27,7 +30,7 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
-    public AuthenticationService(AdminRepository adminRepository, com.LMS.LMS.Repositories.InstructorRepository instructorRepository, StudentRepository studentRepository, PasswordEncoder passwordEncoder,
+    public AuthenticationService(AdminRepository adminRepository, InstructorRepository instructorRepository, StudentRepository studentRepository, PasswordEncoder passwordEncoder,
                                  JwtService jwtService, AuthenticationManager authenticationManager) {
         this.adminRepository = adminRepository;
         this.instructorRepository = instructorRepository;
@@ -78,7 +81,33 @@ public class AuthenticationService {
         }
     }
 
+    public APIResponse completeProfile(String email, CompleteProfileParams profileParams) {
+        Optional<User> userOptional = findUserByEmail(email);
+        if (userOptional.isEmpty()) {
+            throw new IllegalArgumentException("User not found");
+        }
 
+        User user = userOptional.get();
+        user.setPhone(profileParams.phone);
+        user.setAddress(profileParams.Address);
+        saveUser(user);
+        String token = jwtService.GenerateJwtToken(user);
+        return new AuthenticationResponse(200, token);
+    }
+    public ProfileDTO viewProfile(String email) {
+        Optional<User> userOptional = findUserByEmail(email);
+        if (userOptional.isEmpty()) {
+            throw new IllegalArgumentException("User not found");
+        }
+
+        User user = userOptional.get();
+        return new ProfileDTO(
+                user.getName(),
+                user.getEmail(),
+                user.getPhone(),
+                user.getAddress()
+        );
+    }
     private Optional<User> findUserByEmail(String email) {
         Optional<User> user = studentRepository.findByEmail(email);
         if (user.isPresent()) return user;
