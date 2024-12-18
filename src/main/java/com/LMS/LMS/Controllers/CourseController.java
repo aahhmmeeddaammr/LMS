@@ -56,6 +56,10 @@ public class CourseController {
         return ResponseEntity.ok(courseService.enrollStudent(params.getCourse_id(), ID));
     }
 
+    @DeleteMapping("/delete/{sid}/{cid}")
+    public ResponseEntity<APIResponse> deleteCourse(@PathVariable int sid, @PathVariable int cid) {
+        return  ResponseEntity.ok(courseService.deleteStudent(sid,cid));
+    }
     @PostMapping("/add-lesson")
     public ResponseEntity<APIResponse> addLesson(@RequestBody AddLessonParams params) throws Exception {
         return ResponseEntity.ok(courseService.addLesson(params));

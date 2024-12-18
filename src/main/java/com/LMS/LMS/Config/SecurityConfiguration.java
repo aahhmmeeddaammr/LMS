@@ -35,6 +35,7 @@ public class SecurityConfiguration {
                         .requestMatchers("api/v1/course/add-material/**").hasRole("ROLE_Instructor")
                         .requestMatchers("/api/v1/course/**").hasAnyRole("ROLE_Instructor", "ROLE_Student", "ROLE_ADMIN")
                         .requestMatchers("/api/v1/assessment/submit-quiz/{id}").hasRole("ROLE_Student")
+                        .requestMatchers("/api/v1/course/delete/{sid}/{cid}").hasRole("ROLE_Instructor")
                         .requestMatchers("/api/v1/assessment/add-questions/{id}").permitAll()
                         .requestMatchers("/api/v1/assessment/generate-quiz/{id}").permitAll()
                         .requestMatchers("/api/v1/assessment/get-quiz/{id}").permitAll()

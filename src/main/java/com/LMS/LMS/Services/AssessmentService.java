@@ -21,7 +21,6 @@ import java.util.Objects;
 
 @Service
 public class AssessmentService {
-
     private final QuestionRepository questionRepository;
     private final AnswerRepository answerRepository;
     private final QuizRepository quizRepository;
@@ -31,8 +30,8 @@ public class AssessmentService {
     private final UploadFileService uploadFileService;
     private final AssignmentFileRepository assignmentFileRepository;
     private final AssignmentRepository assignmentRepository;
-
-    public AssessmentService(QuestionRepository questionRepository, AnswerRepository answerRepository, QuizRepository quizRepository, CourseRepository courseRepository, StudentRepository studentRepository, StudentQuizzesRepository studentQuizzesRepository, UploadFileService uploadFileService, AssignmentFileRepository assignmentFileRepository, AssignmentRepository assignmentRepository) {
+    private final  EmailService emailService;
+    public AssessmentService(QuestionRepository questionRepository, AnswerRepository answerRepository, QuizRepository quizRepository, CourseRepository courseRepository, StudentRepository studentRepository, StudentQuizzesRepository studentQuizzesRepository, UploadFileService uploadFileService, AssignmentFileRepository assignmentFileRepository, AssignmentRepository assignmentRepository, EmailService emailService) {
         this.questionRepository = questionRepository;
         this.answerRepository = answerRepository;
         this.quizRepository = quizRepository;
@@ -42,6 +41,7 @@ public class AssessmentService {
         this.uploadFileService = uploadFileService;
         this.assignmentFileRepository = assignmentFileRepository;
         this.assignmentRepository = assignmentRepository;
+        this.emailService = emailService;
     }
 
     public APIResponse createQuestionBank(List<AddQuestionsParams> paramsList, int CrsId) {
@@ -93,6 +93,14 @@ public class AssessmentService {
         if (params.noOfQuestions > course.getQuestionBank().size()) {
             throw new IllegalArgumentException("Number of questions is greater than the number of questions in question bank");
         }
+        List<Student>students= course.getStudents();
+        for (Student student : students) {
+            Email email = new Email();
+            email.setRecipient(student.getEmail());
+            email.setSubject("Student Deletion Successfully");
+            email.setMsgBody("Student Deletion Successfully");
+            emailService.sendSimpleMail(email);
+        }
         Quiz quiz = new Quiz();
         quiz.setTitle(params.title);
         quiz.setDuration(params.duration);
@@ -126,7 +134,6 @@ public class AssessmentService {
         if (studentQuizzesRepository.findById(new StudentsQuizzesPK(student, quiz)).orElse(null) != null) {
             throw new IllegalArgumentException("You have submitted the quiz already");
         }
-        ;
         double grade = 0;
         List<Question> questions = quiz.getQuestions();
         double weight = quiz.getScore() / questions.size();
@@ -188,5 +195,4 @@ public class AssessmentService {
         }
         return quizQuestions;
     }
-
 }

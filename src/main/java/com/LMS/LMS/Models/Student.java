@@ -9,7 +9,6 @@ import java.util.List;
 @Entity
 public class Student extends User  implements UserDetails {
 
-
     @ManyToMany
     List<Course> courses = new ArrayList<Course>();
 

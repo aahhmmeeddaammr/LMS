@@ -23,8 +23,8 @@ public class CourseService {
     private final AttendanceRepository attendanceRepository;
     private final ModelFileRepository modelFileRepository;
     private final UploadFileService uploadFileService;
-
-    public CourseService(CourseRepository courseRepository, InstructorRepository instructorRepository, StudentRepository studentRepository, LessonRepository lessonRepository, AttendanceRepository attendanceRepository, ModelFileRepository modelFileRepository, UploadFileService uploadFileService) {
+    private final EmailService emailService;
+    public CourseService(CourseRepository courseRepository, InstructorRepository instructorRepository, StudentRepository studentRepository, LessonRepository lessonRepository, AttendanceRepository attendanceRepository, ModelFileRepository modelFileRepository, UploadFileService uploadFileService, EmailService emailService) {
         this.courseRepository = courseRepository;
         this.instructorRepository = instructorRepository;
         this.studentRepository = studentRepository;
@@ -32,6 +32,7 @@ public class CourseService {
         this.attendanceRepository = attendanceRepository;
         this.modelFileRepository = modelFileRepository;
         this.uploadFileService = uploadFileService;
+        this.emailService = emailService;
     }
 
     public APIResponse addCourse(AddCourseParams course, int id) {
@@ -78,6 +79,28 @@ public class CourseService {
         studentRepository.save(student);
         courseRepository.save(course);
         return new GetResponse<>(200, "Student Enrolled Successfully");
+    }
+
+    public APIResponse deleteStudent(int CrsId, int StdId) {
+        var course = courseRepository.findById(CrsId).orElse(null);
+        if (course == null) {
+            throw new IllegalArgumentException("Course not found");
+        }
+        var student = studentRepository.findById(StdId).orElse(null);
+        if (student == null) {
+            throw new IllegalArgumentException("Student not found");
+        }
+        Email email = new Email();
+        email.setRecipient(student.getEmail());
+        email.setSubject("Student Deletion Successfully");
+        email.setMsgBody("Student Deletion Successfully");
+//        email.setAttachment("student.png");
+        course.getStudents().remove(student);
+        student.getCourses().remove(course);
+        emailService.sendSimpleMail(email);
+        studentRepository.save(student);
+        courseRepository.save(course);
+        return new GetResponse<>(200, "Student Deleted Successfully");
     }
 
     public APIResponse addLesson(AddLessonParams params) throws Exception {

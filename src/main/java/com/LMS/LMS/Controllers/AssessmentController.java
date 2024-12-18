@@ -65,7 +65,6 @@ public class AssessmentController {
         params.description = description;
         params.grade = grade;
 
-        // Convert deadline string to Date
         try {
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
             params.deadline = formatter.parse(deadline);
