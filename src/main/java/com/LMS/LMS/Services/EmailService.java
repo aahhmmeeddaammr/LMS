@@ -18,8 +18,7 @@ public class EmailService {
         this.javaMailSender = javaMailSender;
     }
     @Value("${spring.mail.username}") private String sender;
-    public String sendSimpleMail(Email email)
-    {
+    public String sendSimpleMail(Email email) {
         try {
             SimpleMailMessage mailMessage = new SimpleMailMessage();
             mailMessage.setFrom(sender);
@@ -33,8 +32,7 @@ public class EmailService {
             return "Error while Sending Mail";
         }
     }
-    public String sendMailWithAttachment(Email email)
-    {
+    public String sendMailWithAttachment(Email email) {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper mimeMessageHelper;
 
@@ -54,5 +52,4 @@ public class EmailService {
             return "Error while sending mail!!!";
         }
     }
-
 }

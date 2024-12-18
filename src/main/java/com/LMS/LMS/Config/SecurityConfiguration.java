@@ -41,6 +41,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/v1/assessment/get-quiz/{id}").permitAll()
                         .requestMatchers("/api/v1/assessment/add-assignment/{id}").permitAll()
                         .requestMatchers("/api/v1/assessment/submit-assignment/{id}").permitAll()
+                        .requestMatchers("/api/v1/auth/complete-profile").authenticated()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
