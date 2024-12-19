@@ -2,10 +2,7 @@ package com.LMS.LMS.Controllers;
 
 import com.LMS.LMS.Controllers.ApiResponses.APIResponse;
 import com.LMS.LMS.Controllers.ApiResponses.GetResponse;
-import com.LMS.LMS.Controllers.ControllerParams.AddAssignmentParams;
-import com.LMS.LMS.Controllers.ControllerParams.AddQuestionsParams;
-import com.LMS.LMS.Controllers.ControllerParams.AddQuizParams;
-import com.LMS.LMS.Controllers.ControllerParams.SubmitQuizParams;
+import com.LMS.LMS.Controllers.ControllerParams.*;
 import com.LMS.LMS.Services.AssessmentService;
 import com.LMS.LMS.Services.JwtService;
 import org.springframework.http.MediaType;
@@ -77,10 +74,25 @@ public class AssessmentController {
     }
 
     @PostMapping("/submit-assignment/{id}")
-    public ResponseEntity<APIResponse> submitAssignment(@RequestParam("files") List<MultipartFile> files , @RequestHeader String Authorization, @PathVariable int id){
+    public ResponseEntity<APIResponse> submitAssignment(@RequestParam("files") List<MultipartFile> files, @RequestHeader String Authorization, @PathVariable int id) {
         String token = Authorization.substring(7);
         var Claims = jwtService.ExtractClaimsFromJWT(token);
         int stdID = Claims.get("id", Integer.class);
-        return ResponseEntity.ok(assessmentService.submitAssignment(files , id, stdID));
+        return ResponseEntity.ok(assessmentService.submitAssignment(files, id, stdID));
+    }
+
+    @GetMapping("/get-students-assignments/{id}")
+    public ResponseEntity<APIResponse> getStudentsAssignments(@PathVariable int id) {
+        return ResponseEntity.ok(assessmentService.getAllStudentAssignments(id));
+    }
+
+    @GetMapping("/get-student-assignment")
+    public ResponseEntity<APIResponse> getStudentAssignment(@RequestBody GetStudentAssignmentParams params) {
+        return ResponseEntity.ok(assessmentService.getStudentAssignment(params));
+    }
+
+    @PostMapping("/correct-assignment")
+    public ResponseEntity<APIResponse> correctAssignment(@RequestBody CorrectAssignmentParams params) {
+        return ResponseEntity.ok(assessmentService.correctAssignment(params));
     }
 }

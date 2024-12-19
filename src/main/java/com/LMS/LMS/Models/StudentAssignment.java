@@ -9,6 +9,7 @@ import java.util.List;
 @Entity
 @IdClass(StudentAssignmentPK.class)
 public class StudentAssignment {
+
     @Id
     @ManyToOne
     @JoinColumn(name = "student_id", nullable = false)
@@ -20,10 +21,13 @@ public class StudentAssignment {
     private Assignment assignment;
 
     @Column
-    private int Grade;
+    private double Grade;
 
     @Column
     private String Feedback;
+
+    @Column
+    private boolean isCorrected;
 
     @OneToMany(mappedBy = "submittedAssignment")
     private List<SubmittedAssignmentFile> files = new ArrayList<>();
@@ -60,11 +64,19 @@ public class StudentAssignment {
         this.assignment = assignment;
     }
 
-    public int getGrade() {
+    public double getGrade() {
         return Grade;
     }
 
-    public void setGrade(int grade) {
+    public void setGrade(double grade) {
         Grade = grade;
+    }
+
+    public boolean getIsCorrected() {
+        return isCorrected;
+    }
+
+    public void setIsCorrected(boolean corrected) {
+        isCorrected = corrected;
     }
 }

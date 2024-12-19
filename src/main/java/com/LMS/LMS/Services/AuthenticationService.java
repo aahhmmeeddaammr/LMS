@@ -94,6 +94,7 @@ public class AuthenticationService {
         String token = jwtService.GenerateJwtToken(user);
         return new AuthenticationResponse(200, token);
     }
+
     public ProfileDTO viewProfile(String email) {
         Optional<User> userOptional = findUserByEmail(email);
         if (userOptional.isEmpty()) {
@@ -108,6 +109,7 @@ public class AuthenticationService {
                 user.getAddress()
         );
     }
+
     private Optional<User> findUserByEmail(String email) {
         Optional<User> user = studentRepository.findByEmail(email);
         if (user.isPresent()) return user;

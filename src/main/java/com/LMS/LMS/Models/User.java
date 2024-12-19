@@ -25,8 +25,11 @@ public  class User {
 
     @Enumerated(EnumType.STRING)
     protected Role role;
+
     protected String phone;
+
     protected String address;
+
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
     }
@@ -54,6 +57,7 @@ public  class User {
     public  int getId(){
         return id;
     }
+
     public  String getName(){
         return name;
     }

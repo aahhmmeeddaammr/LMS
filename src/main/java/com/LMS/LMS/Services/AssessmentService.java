@@ -2,11 +2,10 @@ package com.LMS.LMS.Services;
 
 import com.LMS.LMS.Controllers.ApiResponses.APIResponse;
 import com.LMS.LMS.Controllers.ApiResponses.GetResponse;
-import com.LMS.LMS.Controllers.ControllerParams.AddAssignmentParams;
-import com.LMS.LMS.Controllers.ControllerParams.AddQuestionsParams;
-import com.LMS.LMS.Controllers.ControllerParams.AddQuizParams;
-import com.LMS.LMS.Controllers.ControllerParams.SubmitQuizParams;
+import com.LMS.LMS.Controllers.ControllerParams.*;
 import com.LMS.LMS.DTOs.QuizDTO;
+import com.LMS.LMS.DTOs.StudentAssignmentDTO;
+import com.LMS.LMS.DTOs.SubmittedAssignmentFileDTO;
 import com.LMS.LMS.Models.*;
 import com.LMS.LMS.Repositories.*;
 import org.springframework.stereotype.Service;
@@ -19,6 +18,7 @@ import java.util.Objects;
 
 @Service
 public class AssessmentService {
+
     private final QuestionRepository questionRepository;
     private final AnswerRepository answerRepository;
     private final QuizRepository quizRepository;
@@ -84,7 +84,7 @@ public class AssessmentService {
         course.setQuestionBank(newQuestions);
         courseRepository.save(course);
 
-        List<Student>students= course.getStudents();
+        List<Student> students = course.getStudents();
         for (Student student : students) {
             Email email = new Email();
             email.setRecipient(student.getEmail());
@@ -217,7 +217,7 @@ public class AssessmentService {
         courseRepository.save(course);
 
 
-        List<Student>students= course.getStudents();
+        List<Student> students = course.getStudents();
         for (Student student : students) {
             Email email = new Email();
             email.setRecipient(student.getEmail());
@@ -256,6 +256,60 @@ public class AssessmentService {
             submittedAssignmentFileRepository.save(NewFile);
         }
         return new GetResponse<>(200, "Assignment Submitted Successfully");
+    }
+
+    public APIResponse getAllStudentAssignments(int assignmentId) {
+        List<StudentAssignment> studentAssignments = studentAssignmentRepository.findAllByAssignmentId(assignmentId);
+        if (studentAssignments.isEmpty()) {
+            throw new IllegalArgumentException("No Assignments Found");
+        }
+        List<StudentAssignmentDTO> studentAssignmentDTOS = studentAssignments.stream().map(StudentAssignmentDTO::new).toList();
+        return new GetResponse<>(200, studentAssignmentDTOS);
+    }
+
+    public APIResponse getStudentAssignment(GetStudentAssignmentParams param) {
+        Assignment assignment = assignmentRepository.findById(param.assignmentId).orElse(null);
+        if (assignment == null) {
+            throw new IllegalArgumentException("Assignment not found");
+        }
+        Student student = studentRepository.findById(param.studentId).orElse(null);
+        if (student == null) {
+            throw new IllegalArgumentException("Student not found");
+        }
+        StudentAssignmentPK pk = new StudentAssignmentPK(student, assignment);
+        StudentAssignment studentAssignment = studentAssignmentRepository.findById(pk).orElse(null);
+        if (studentAssignment == null) {
+            throw new IllegalArgumentException("Student haven't submitted the assignment");
+        }
+        SubmittedAssignmentFileDTO dto =
+                new SubmittedAssignmentFileDTO(
+                        submittedAssignmentFileRepository.findAllBySubmittedAssignment(studentAssignment).stream().map(File::getFilePath).toList()
+                        , studentAssignment);
+        return new GetResponse<>(200, dto);
+    }
+
+    public APIResponse correctAssignment(CorrectAssignmentParams param) {
+        Assignment assignment = assignmentRepository.findById(param.assignmentId).orElse(null);
+        if (assignment == null) {
+            throw new IllegalArgumentException("Assignment not found");
+        }
+        Student student = studentRepository.findById(param.studentId).orElse(null);
+        if (student == null) {
+            throw new IllegalArgumentException("Student not found");
+        }
+        StudentAssignmentPK pk = new StudentAssignmentPK(student, assignment);
+        StudentAssignment studentAssignment = studentAssignmentRepository.findById(pk).orElse(null);
+        if (studentAssignment == null) {
+            throw new IllegalArgumentException("Student haven't submitted the assignment");
+        }
+        if (studentAssignment.getIsCorrected()) {
+            throw new IllegalArgumentException("Student assignment has already been corrected");
+        }
+        studentAssignment.setIsCorrected(true);
+        studentAssignment.setGrade(param.grade);
+        studentAssignment.setFeedback(param.feedback);
+        studentAssignmentRepository.save(studentAssignment);
+        return new GetResponse<>(200, "Assignment Corrected Successfully");
     }
 
     private List<Question> GenerateQuiz(int noOfQuestions, List<Question> questions) {
