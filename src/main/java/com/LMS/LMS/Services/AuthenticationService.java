@@ -13,10 +13,8 @@ import com.LMS.LMS.Repositories.InstructorRepository;
 import com.LMS.LMS.Repositories.StudentRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 
@@ -120,7 +118,7 @@ public class AuthenticationService {
             adminRepository.save((Admin) user);
         }
     }
-    private boolean completeOrUpdateProfile(String email, CompleteProfileParams profileParams) {
+    private void completeOrUpdateProfile(String email, CompleteProfileParams profileParams) {
         try {
             Optional<User> userOptional = findUserByEmail(email);
             if (userOptional.isEmpty()) {
@@ -130,7 +128,6 @@ public class AuthenticationService {
             user.setPhone(profileParams.phone);
             user.setAddress(profileParams.Address);
             saveUser(user);
-            return true;
         }catch (Exception e) {
             throw new IllegalArgumentException(e.getMessage());
         }
