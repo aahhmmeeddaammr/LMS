@@ -31,7 +31,7 @@ public class AuthenticationController {
         return ResponseEntity.ok(authenticationService.Register(User));
     }
 
-    @PutMapping("/complete-profile")
+    @PostMapping("/complete-profile")
     public ResponseEntity<APIResponse> completeProfile(@RequestBody CompleteProfileParams params, @RequestHeader String Authorization){
         String token = Authorization.substring(7);
         var Claims = jwtService.ExtractClaimsFromJWT(token);
@@ -42,8 +42,14 @@ public class AuthenticationController {
     public ResponseEntity<APIResponse> viewProfile(@RequestHeader String Authorization){
         String token = Authorization.substring(7);
         var Claims = jwtService.ExtractClaimsFromJWT(token);
-        String email = Claims.get("email").toString(); // Id of User want to complete profile
-        ProfileDTO profile = authenticationService.viewProfile(email);
-        return ResponseEntity.ok(new GetResponse<>(200,profile));
+        String email = Claims.get("email").toString();
+        return ResponseEntity.ok(authenticationService.viewProfile(email));
+    }
+    @PutMapping("/update-profile")
+    public ResponseEntity<APIResponse> updateProfile(@RequestBody CompleteProfileParams params, @RequestHeader String Authorization){
+        String token = Authorization.substring(7);
+        var Claims = jwtService.ExtractClaimsFromJWT(token);
+        String email = Claims.get("email").toString();
+        return ResponseEntity.ok(authenticationService.updateProfile(email, params));
     }
 }
