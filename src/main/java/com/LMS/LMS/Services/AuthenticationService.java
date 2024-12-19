@@ -2,6 +2,7 @@ package com.LMS.LMS.Services;
 
 import com.LMS.LMS.Controllers.ApiResponses.APIResponse;
 import com.LMS.LMS.Controllers.ApiResponses.AuthenticationResponse;
+import com.LMS.LMS.Controllers.ApiResponses.GetResponse;
 import com.LMS.LMS.Controllers.ControllerParams.CompleteProfileParams;
 import com.LMS.LMS.Controllers.ControllerParams.LoginParams;
 import com.LMS.LMS.Controllers.ControllerParams.RegisterParams;
@@ -59,17 +60,13 @@ public class AuthenticationService {
         if (userFind.isPresent()) {
             throw new IllegalArgumentException("Email is already in use");
         }
-        User user;
+        User user = switch (registerParams.role) {
+            case "Student" -> new Student();
+            case "Instructor" -> new Instructor();
+            case "Admin" -> new Admin();
+            default -> throw new IllegalArgumentException("Invalid Role");
+        };
 
-        if(registerParams.role.equals("Student")){
-            user= new Student();
-        }else if(registerParams.role.equals("Instructor")){
-            user= new Instructor();
-        }else if(registerParams.role.equals("Admin")){
-            user = new Admin();
-        }else{
-            throw new IllegalArgumentException("Invalid Role");
-        }
             user.setEmail(registerParams.email);
             user.setName(registerParams.name);
             user.setPassword(passwordEncoder.encode(registerParams.password));
@@ -82,32 +79,31 @@ public class AuthenticationService {
     }
 
     public APIResponse completeProfile(String email, CompleteProfileParams profileParams) {
+        try {
+            completeOrUpdateProfile(email, profileParams);
+            return new GetResponse<>(200 , "Your Profile completed successfully");
+        }catch (Exception e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
+    }
+    public APIResponse viewProfile(String email) {
         Optional<User> userOptional = findUserByEmail(email);
         if (userOptional.isEmpty()) {
             throw new IllegalArgumentException("User not found");
         }
 
         User user = userOptional.get();
-        user.setPhone(profileParams.phone);
-        user.setAddress(profileParams.Address);
-        saveUser(user);
-        String token = jwtService.GenerateJwtToken(user);
-        return new AuthenticationResponse(200, token);
+        return new GetResponse<>(200 , new ProfileDTO(user));
     }
-    public ProfileDTO viewProfile(String email) {
-        Optional<User> userOptional = findUserByEmail(email);
-        if (userOptional.isEmpty()) {
-            throw new IllegalArgumentException("User not found");
+    public APIResponse updateProfile(String email, CompleteProfileParams profileParams) {
+        try {
+            completeOrUpdateProfile(email, profileParams);
+            return new GetResponse<>(200 , "Your Profile Updated successfully");
+        }catch (Exception e) {
+            throw new IllegalArgumentException(e.getMessage());
         }
-
-        User user = userOptional.get();
-        return new ProfileDTO(
-                user.getName(),
-                user.getEmail(),
-                user.getPhone(),
-                user.getAddress()
-        );
     }
+
     private Optional<User> findUserByEmail(String email) {
         Optional<User> user = studentRepository.findByEmail(email);
         if (user.isPresent()) return user;
@@ -122,6 +118,21 @@ public class AuthenticationService {
             instructorRepository.save((Instructor) user);
         } else if (user instanceof Admin) {
             adminRepository.save((Admin) user);
+        }
+    }
+    private boolean completeOrUpdateProfile(String email, CompleteProfileParams profileParams) {
+        try {
+            Optional<User> userOptional = findUserByEmail(email);
+            if (userOptional.isEmpty()) {
+                throw new IllegalArgumentException("User not found");
+            }
+            User user = userOptional.get();
+            user.setPhone(profileParams.phone);
+            user.setAddress(profileParams.Address);
+            saveUser(user);
+            return true;
+        }catch (Exception e) {
+            throw new IllegalArgumentException(e.getMessage());
         }
     }
 }
