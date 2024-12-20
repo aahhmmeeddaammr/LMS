@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignment Grade Received</title>
+    <style>
+        body {
+            background-color: #f4f4f4;
+            color: #333;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            font-size: 24px;
+        }
+        p {
+            color: #666;
+            font-size: 16px;
+        }
+        .grade {
+            font-weight: bold;
+            font-size: 18px;
+            color: #28a745;
+        }
+        a {
+            color: #1e90ff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Your Grade for the Assignment: {{assignmentTitle}}</h1>
+    <p>Dear {{studentName}},</p>
+    <p>We hope you are doing well. Your grade for the assignment titled "<strong>{{assignmentTitle}}</strong>" has been assessed.</p>
+    <p>Your score: <span class="grade">{{grade}}</span></p>
+    <p>You can view the detailed results and feedback by clicking the link below:</p>
+    <p>If you have any questions or concerns, please do not hesitate to reach out to your instructor.</p>
+    <p>Best regards,<br>Your Course Team</p>
+</div>
+</body>
+</html>

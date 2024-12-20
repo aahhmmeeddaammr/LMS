@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Grade Received</title>
+    <style>
+        body {
+            background-color: #f4f4f4;
+            color: #333;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            font-size: 24px;
+        }
+        p {
+            color: #666;
+            font-size: 16px;
+        }
+        .grade {
+            font-weight: bold;
+            font-size: 18px;
+            color: #1e90ff;
+        }
+        a {
+            color: #1e90ff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 20px 0;
+            font-size: 16px;
+            color: #fff;
+            background-color: #1e90ff;
+            border-radius: 4px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Your Grade for the Quiz: {{quizTitle}}</h1>
+    <p>Dear {{studentName}},</p>
+    <p>We hope you're doing well. Your grade for the quiz titled "<strong>{{quizTitle}}</strong>" has been finalized.</p>
+    <p>Your score: <span class="grade">{{grade}}</span></p>
+    <p>You can view your detailed results and feedback by clicking the link below:</p>
+    <p>If you have any questions or concerns, feel free to reach out to your instructor.</p>
+    <p>Best regards,<br>Your Course Team</p>
+</div>
+</body>
+</html>

@@ -51,15 +51,7 @@ public class CourseService {
             NewCourse.setInstructor(instructor);
             courseRepository.save(NewCourse);
 
-            var students = studentRepository.findAll();
-            students.forEach(student -> {
-                Email email = new Email();
-                email.setRecipient(student.getEmail());
-                email.setSubject("New Course Added");
-                email.setMsgBody("A new course  '" + course.Title + "' has been added. Check it out!");
-                emailService.sendSimpleMail(email);
-                notificationService.sendNotificationToStudent(student, "A new course '" + course.Title + "' has been added. Check it out!");
-            });
+
 
             return new GetResponse<>(200, course);
         } catch (Exception e) {
@@ -100,7 +92,7 @@ public class CourseService {
         email.setRecipient(student.getEmail());
         email.setSubject("Enrollment Confirmation");
         email.setMsgBody("You have been successfully enrolled in the course: '" + course.getTitle() + "'.");
-        emailService.sendSimpleMail(email);
+        emailService.sendEnrollmentEmail(course.getTitle() , email);
         notificationService.sendNotificationToStudent(student, "'" + course.getTitle()  + "' course is enrolled successfully");
         notificationService.sendNotificationToInstructor(course.getInstructor(), "Student with email '" + student.getEmail() + "' has enrolled '" + course.getTitle() + "' course.");
 
@@ -125,7 +117,7 @@ public class CourseService {
         email.setMsgBody("You have been removed from the course: '" + course.getTitle() + "'.");
         course.getStudents().remove(student);
         student.getCourses().remove(course);
-        emailService.sendSimpleMail(email);
+        emailService.sendRemoveFromCourseEmail(course.getTitle() , email);
         notificationService.sendNotificationToStudent(student, "You have been removed from this course: '" + course.getTitle() + "'.");
         studentRepository.save(student);
         courseRepository.save(course);
@@ -153,7 +145,7 @@ public class CourseService {
                 email.setRecipient(student.getEmail());
                 email.setSubject("New Lesson Added");
                 email.setMsgBody("A new lesson titled '" + lesson.title + "' has been added to the course: '" + course.getTitle() + "'.");
-                emailService.sendSimpleMail(email);
+                emailService.sendAddLessonEmail(course.getTitle() , email , lesson.title);
                 notificationService.sendNotificationToStudent(student, "A new lesson titled '" + lesson.title + "' has been added to the course: '" + course.getTitle() + "'.");
             });
 
@@ -199,7 +191,7 @@ public class CourseService {
             email.setSubject("New Material Uploaded");
             email.setMsgBody("New material has been uploaded for the course: '" + course.getTitle() + "'. Check it out!");
             email.setAttachment(NewFilePathName);
-            emailService.sendMailWithAttachment(email);
+            emailService.sendAddMaterialEmail( course.getTitle() , email);
             notificationService.sendNotificationToStudent(student, "New material has been uploaded for the '" + course.getTitle() + "' course. Check it out!");
         });
 

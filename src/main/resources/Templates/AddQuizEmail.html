@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Quiz Added</title>
+    <style>
+        body {
+            background-color: #f4f4f4;
+            color: #333;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            font-size: 24px;
+        }
+        p {
+            color: #666;
+            font-size: 16px;
+        }
+        a {
+            color: #1e90ff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 20px 0;
+            font-size: 16px;
+            color: #fff;
+            background-color: #1e90ff;
+            border-radius: 4px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>New Quiz Added to the Course: {{courseName}}</h1>
+    <p>Dear {{studentName}},</p>
+    <p>A new quiz titled "<strong>{{quizTitle}}</strong>" has been added to your course. Please make sure to complete it by the due date.</p>
+    <p>Click the link below to access the quiz:</p>
+    <p>Start at {{startDate}}</p>
+    <p>Best regards,<br>Your Course Team</p>
+</div>
+</body>
+</html>

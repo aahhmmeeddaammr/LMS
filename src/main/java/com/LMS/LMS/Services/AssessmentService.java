@@ -86,14 +86,7 @@ public class AssessmentService {
         course.setQuestionBank(newQuestions);
         courseRepository.save(course);
 
-        List<Student> students = course.getStudents();
-        for (Student student : students) {
-            Email email = new Email();
-            email.setRecipient(student.getEmail());
-            email.setSubject("New Questions Added");
-            email.setMsgBody("New questions have been added to the course: " + course.getTitle());
-            emailService.sendSimpleMail(email);
-        }
+
 
         return new GetResponse<>(200, "Questions Added Successfully");
     }
@@ -106,15 +99,7 @@ public class AssessmentService {
         if (params.noOfQuestions > course.getQuestionBank().size()) {
             throw new IllegalArgumentException("Number of questions is greater than the number of questions in question bank");
         }
-        List<Student> students = course.getStudents();
-        for (Student student : students) {
-            Email email = new Email();
-            email.setRecipient(student.getEmail());
-            email.setSubject("New Quiz Created");
-            email.setMsgBody("A new quiz titled '" + params.title + "' has been created in the course: " + course.getTitle());
-            emailService.sendSimpleMail(email);
-            notificationService.sendNotificationToStudent(student, "A new quiz titled '" + params.title + "' has been created in the '" + course.getTitle() + "' course with duration '" + params.duration + " hours'.");
-        }
+
         Quiz quiz = new Quiz();
         quiz.setTitle(params.title);
         quiz.setDuration(params.duration);
@@ -123,6 +108,15 @@ public class AssessmentService {
         quiz.setCourse(course);
         List<Question> newQuestions = GenerateQuiz(params.noOfQuestions, course.getQuestionBank());
         quiz.setQuestions(newQuestions);
+        List<Student> students = course.getStudents();
+        for (Student student : students) {
+            Email email = new Email();
+            email.setRecipient(student.getEmail());
+            email.setSubject("New Quiz Created");
+            email.setMsgBody("A new quiz titled '" + params.title + "' has been created in the course: " + course.getTitle());
+            emailService.sendAddQuizEmail(course.getTitle() , quiz, email);
+            notificationService.sendNotificationToStudent(student, "A new quiz titled '" + params.title + "' has been created in the '" + course.getTitle() + "' course with duration '" + params.duration + " hours'.");
+        }
         quizRepository.save(quiz);
         return new GetResponse<>(200, "Quiz Created Successfully");
     }
@@ -155,7 +149,7 @@ public class AssessmentService {
             throw new IllegalArgumentException("You have submitted the quiz already");
         }
         double grade = 0;
-        LocalDateTime quizEndTime = quiz.getStartDate().plusMinutes((long) quiz.getDuration());
+        LocalDateTime quizEndTime = quiz.getStartDate().plusHours((long) quiz.getDuration());
         if (currentTime.isAfter(quizEndTime)) {
             StudentsQuizzes studentsQuizzes = new StudentsQuizzes();
             studentsQuizzes.setQuiz(quiz);
@@ -167,7 +161,7 @@ public class AssessmentService {
             email.setRecipient(student.getEmail());
             email.setSubject("Quiz Submission");
             email.setMsgBody("You submitted the quiz late. Your grade is 0.");
-            emailService.sendSimpleMail(email);
+            emailService.sendGradeEmail(quiz.getCourse().getTitle(),quiz,email,0.0);
             notificationService.sendNotificationToStudent(student, "You submitted the quiz late :( .");
 
             return new GetResponse<>(400, "Quiz has ended. Submission not allowed. Your Grade Is 0");
@@ -191,9 +185,8 @@ public class AssessmentService {
         email.setRecipient(student.getEmail());
         email.setSubject("Quiz Submission Confirmation");
         email.setMsgBody("You submitted the quiz '" + quiz.getTitle() + "' with a grade: " + grade);
-        emailService.sendSimpleMail(email);
+        emailService.sendGradeEmail(quiz.getCourse().getTitle(),quiz,email,grade);
         notificationService.sendNotificationToStudent(student, "You submitted the quiz titled '" + quiz.getTitle() + "' successfully, your grade is: " + grade);
-
         return new GetResponse<>(200, "Quiz Submitted Successfully with grade :  " + grade);
     }
 
@@ -228,7 +221,7 @@ public class AssessmentService {
             email.setRecipient(student.getEmail());
             email.setSubject("New Assignment Added");
             email.setMsgBody("A new assignment titled '" + params.title + "' has been added to the course: " + course.getTitle());
-            emailService.sendSimpleMail(email);
+//            emailService.sendSimpleMail(email);
             notificationService.sendNotificationToStudent(student, "A new assignment titled '" + params.title + "' has been added to the '" + course.getTitle() + "' course.");
         }
 
@@ -316,6 +309,11 @@ public class AssessmentService {
         studentAssignment.setGrade(param.grade);
         studentAssignment.setFeedback(param.feedback);
         studentAssignmentRepository.save(studentAssignment);
+        Email email = new Email();
+        email.setRecipient(student.getEmail());
+        email.setSubject("Assignment Corrected Successfully");
+        email.setMsgBody("Done");
+        emailService.sendAssignmentFeedbackAndGrade(assignment.getTitle(),email,param.grade,param.feedback);
         notificationService.sendNotificationToStudent(student, "Assignment titled '" + assignment.getTitle() + "' is corrected successfully, your grade is " + param.grade);
 
         return new GetResponse<>(200, "Assignment Corrected Successfully");
