@@ -31,8 +31,9 @@ public class AssessmentService {
     private final EmailService emailService;
     private final StudentAssignmentRepository studentAssignmentRepository;
     private final SubmittedAssignmentFileRepository submittedAssignmentFileRepository;
+    private final NotificationService notificationService;
 
-    public AssessmentService(QuestionRepository questionRepository, AnswerRepository answerRepository, QuizRepository quizRepository, CourseRepository courseRepository, StudentRepository studentRepository, StudentQuizzesRepository studentQuizzesRepository, UploadFileService uploadFileService, AssignmentFileRepository assignmentFileRepository, AssignmentRepository assignmentRepository, EmailService emailService, StudentAssignmentRepository studentAssignmentRepository, SubmittedAssignmentFileRepository studentSubmittedAssignmentFileRepository) {
+    public AssessmentService(QuestionRepository questionRepository, AnswerRepository answerRepository, QuizRepository quizRepository, CourseRepository courseRepository, StudentRepository studentRepository, StudentQuizzesRepository studentQuizzesRepository, UploadFileService uploadFileService, AssignmentFileRepository assignmentFileRepository, AssignmentRepository assignmentRepository, EmailService emailService, StudentAssignmentRepository studentAssignmentRepository, SubmittedAssignmentFileRepository studentSubmittedAssignmentFileRepository, NotificationService notificationService) {
         this.questionRepository = questionRepository;
         this.answerRepository = answerRepository;
         this.quizRepository = quizRepository;
@@ -45,6 +46,7 @@ public class AssessmentService {
         this.emailService = emailService;
         this.studentAssignmentRepository = studentAssignmentRepository;
         this.submittedAssignmentFileRepository = studentSubmittedAssignmentFileRepository;
+        this.notificationService = notificationService;
     }
 
     public APIResponse createQuestionBank(List<AddQuestionsParams> paramsList, int CrsId) {
@@ -111,6 +113,7 @@ public class AssessmentService {
             email.setSubject("New Quiz Created");
             email.setMsgBody("A new quiz titled '" + params.title + "' has been created in the course: " + course.getTitle());
             emailService.sendSimpleMail(email);
+            notificationService.sendNotificationToStudent(student, "A new quiz titled '" + params.title + "' has been created in the '" + course.getTitle() + "' course with duration '" + params.duration + " hours'.");
         }
         Quiz quiz = new Quiz();
         quiz.setTitle(params.title);
@@ -165,6 +168,7 @@ public class AssessmentService {
             email.setSubject("Quiz Submission");
             email.setMsgBody("You submitted the quiz late. Your grade is 0.");
             emailService.sendSimpleMail(email);
+            notificationService.sendNotificationToStudent(student, "You submitted the quiz late :( .");
 
             return new GetResponse<>(400, "Quiz has ended. Submission not allowed. Your Grade Is 0");
 
@@ -188,6 +192,7 @@ public class AssessmentService {
         email.setSubject("Quiz Submission Confirmation");
         email.setMsgBody("You submitted the quiz '" + quiz.getTitle() + "' with a grade: " + grade);
         emailService.sendSimpleMail(email);
+        notificationService.sendNotificationToStudent(student, "You submitted the quiz titled '" + quiz.getTitle() + "' successfully, your grade is: " + grade);
 
         return new GetResponse<>(200, "Quiz Submitted Successfully with grade :  " + grade);
     }
@@ -224,6 +229,7 @@ public class AssessmentService {
             email.setSubject("New Assignment Added");
             email.setMsgBody("A new assignment titled '" + params.title + "' has been added to the course: " + course.getTitle());
             emailService.sendSimpleMail(email);
+            notificationService.sendNotificationToStudent(student, "A new assignment titled '" + params.title + "' has been added to the '" + course.getTitle() + "' course.");
         }
 
         return new GetResponse<>(200, "Assignment Added Successfully");
@@ -255,6 +261,7 @@ public class AssessmentService {
             studentAssignment.getFiles().add(NewFile);
             submittedAssignmentFileRepository.save(NewFile);
         }
+        notificationService.sendNotificationToStudent(student, "Assignment titled '" + assignment.getTitle() + "' Submitted Successfully.");
         return new GetResponse<>(200, "Assignment Submitted Successfully");
     }
 
@@ -309,6 +316,8 @@ public class AssessmentService {
         studentAssignment.setGrade(param.grade);
         studentAssignment.setFeedback(param.feedback);
         studentAssignmentRepository.save(studentAssignment);
+        notificationService.sendNotificationToStudent(student, "Assignment titled '" + assignment.getTitle() + "' is corrected successfully, your grade is " + param.grade);
+
         return new GetResponse<>(200, "Assignment Corrected Successfully");
     }
 

@@ -16,6 +16,9 @@ public class Instructor extends User  implements UserDetails {
     }
 
     @OneToMany(mappedBy = "instructor")
+    private List<InstructorNotification> notifications = new ArrayList<>();
+
+    @OneToMany(mappedBy = "instructor")
     @JsonIgnore
     private List<Course> courses = new ArrayList<Course>();
 

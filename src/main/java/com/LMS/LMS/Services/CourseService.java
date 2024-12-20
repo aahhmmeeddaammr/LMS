@@ -24,8 +24,9 @@ public class CourseService {
     private final ModelFileRepository modelFileRepository;
     private final UploadFileService uploadFileService;
     private final EmailService emailService;
+    private final NotificationService notificationService;
 
-    public CourseService(CourseRepository courseRepository, InstructorRepository instructorRepository, StudentRepository studentRepository, LessonRepository lessonRepository, AttendanceRepository attendanceRepository, ModelFileRepository modelFileRepository, UploadFileService uploadFileService, EmailService emailService) {
+    public CourseService(CourseRepository courseRepository, InstructorRepository instructorRepository, StudentRepository studentRepository, LessonRepository lessonRepository, AttendanceRepository attendanceRepository, ModelFileRepository modelFileRepository, UploadFileService uploadFileService, EmailService emailService, NotificationService notificationService) {
         this.courseRepository = courseRepository;
         this.instructorRepository = instructorRepository;
         this.studentRepository = studentRepository;
@@ -34,6 +35,7 @@ public class CourseService {
         this.modelFileRepository = modelFileRepository;
         this.uploadFileService = uploadFileService;
         this.emailService = emailService;
+        this.notificationService = notificationService;
     }
 
     public APIResponse addCourse(AddCourseParams course, int id) {
@@ -56,6 +58,7 @@ public class CourseService {
                 email.setSubject("New Course Added");
                 email.setMsgBody("A new course  '" + course.Title + "' has been added. Check it out!");
                 emailService.sendSimpleMail(email);
+                notificationService.sendNotificationToStudent(student, "A new course '" + course.Title + "' has been added. Check it out!");
             });
 
             return new GetResponse<>(200, course);
@@ -98,6 +101,8 @@ public class CourseService {
         email.setSubject("Enrollment Confirmation");
         email.setMsgBody("You have been successfully enrolled in the course: '" + course.getTitle() + "'.");
         emailService.sendSimpleMail(email);
+        notificationService.sendNotificationToStudent(student, "'" + course.getTitle()  + "' course is enrolled successfully");
+        notificationService.sendNotificationToInstructor(course.getInstructor(), "Student with email '" + student.getEmail() + "' has enrolled '" + course.getTitle() + "' course.");
 
         return new GetResponse<>(200, "Student Enrolled Successfully");
     }
@@ -121,6 +126,7 @@ public class CourseService {
         course.getStudents().remove(student);
         student.getCourses().remove(course);
         emailService.sendSimpleMail(email);
+        notificationService.sendNotificationToStudent(student, "You have been removed from this course: '" + course.getTitle() + "'.");
         studentRepository.save(student);
         courseRepository.save(course);
         return new GetResponse<>(200, "Student Deleted Successfully");
@@ -148,6 +154,7 @@ public class CourseService {
                 email.setSubject("New Lesson Added");
                 email.setMsgBody("A new lesson titled '" + lesson.title + "' has been added to the course: '" + course.getTitle() + "'.");
                 emailService.sendSimpleMail(email);
+                notificationService.sendNotificationToStudent(student, "A new lesson titled '" + lesson.title + "' has been added to the course: '" + course.getTitle() + "'.");
             });
 
             return new GetResponse<>(200, "Lesson Added Successfully");
@@ -193,6 +200,7 @@ public class CourseService {
             email.setMsgBody("New material has been uploaded for the course: '" + course.getTitle() + "'. Check it out!");
             email.setAttachment(NewFilePathName);
             emailService.sendMailWithAttachment(email);
+            notificationService.sendNotificationToStudent(student, "New material has been uploaded for the '" + course.getTitle() + "' course. Check it out!");
         });
 
         return new GetResponse<>(200, new CourseDTO(course, false));
@@ -203,7 +211,7 @@ public class CourseService {
         for (int i = 0; i < 10; ++i) {
             otp.append((int) Math.floor(Math.random() * 10));
         }
-        if (lessonRepository.findByOTP(otp.toString()) == null) {
+        if (lessonRepository.findByOTP(otp.toString()) != null) {
             return GenerateOTP();
         }
         return otp.toString();

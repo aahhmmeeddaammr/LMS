@@ -47,6 +47,8 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/v1/assessment/correct-assignment").permitAll()
                         .requestMatchers("/api/v1/auth/complete-profile").authenticated()
                         .requestMatchers("/api/v1/auth/view-profile").authenticated()
+                        .requestMatchers("/api/v1/notification/get-all-notifications").permitAll()
+                        .requestMatchers("/api/v1/notification/get-unread-notifications").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
