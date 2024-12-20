@@ -1,7 +1,6 @@
 package com.LMS.LMS.Services;
 
 import com.LMS.LMS.Controllers.ApiResponses.APIResponse;
-import com.LMS.LMS.Controllers.ApiResponses.GetAllResponse;
 import com.LMS.LMS.Controllers.ApiResponses.GetResponse;
 import com.LMS.LMS.Controllers.ControllerParams.AddCourseParams;
 import com.LMS.LMS.Controllers.ControllerParams.AddLessonParams;
@@ -61,7 +60,7 @@ public class CourseService {
 
     public APIResponse getAllCourses(String role) {
         boolean includeStudents = !role.equals("ROLE_Student");
-        return new GetAllResponse<>(200, courseRepository.findAll().stream().map(course -> new CourseDTO(course, includeStudents)).collect(Collectors.toList()));
+        return new GetResponse<>(200, courseRepository.findAll().stream().map(course -> new CourseDTO(course, includeStudents)).collect(Collectors.toList()));
     }
 
     public APIResponse getCourseById(int id, String role) {
