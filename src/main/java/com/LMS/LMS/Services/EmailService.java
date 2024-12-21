@@ -49,7 +49,6 @@ public class EmailService {
         placeholders.put("courseName", courseName);
         placeholders.put("studentName", email.getRecipient().split("@")[0]);
         placeholders.put("lessonTitle", lesson);
-        placeholders.put("lessonLink", email.getAttachment());
         sendSimpleMail(email, placeholders, "/Templates/AddLessonEmail.html");
     }
 
@@ -92,21 +91,21 @@ public class EmailService {
          sendSimpleMail(email, placeholders, "/Templates/QuizGradeEmail.html");
     }
 
-    private String sendSimpleMail(Email email, Map<String, String> placeholders, String mailHTML) {
+    private void sendSimpleMail(Email email, Map<String, String> placeholders, String mailHTML) {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         try {
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, StandardCharsets.UTF_8.name());
             mimeMessageHelper.setFrom(sender);
             mimeMessageHelper.setTo(email.getRecipient());
-
+            System.out.println(0);
             String template = readEmailTemplate(mailHTML);
             if (template == null) {
                 throw new IllegalArgumentException("Email template not found.");
             }
-
             for (Map.Entry<String, String> entry : placeholders.entrySet()) {
                 template = template.replace("{{" + entry.getKey() + "}}", entry.getValue());
             }
+            System.out.println(1);
 
             mimeMessageHelper.setText(template, true); // true enables HTML content
 
@@ -117,11 +116,10 @@ public class EmailService {
             mimeMessageHelper.setSubject(email.getSubject());
 
             javaMailSender.send(mimeMessage);
-            return "Mail sent successfully";
 
         } catch (MessagingException | IOException e) {
             e.printStackTrace();
-            return "Error while sending mail: " + e.getMessage();
+            e.getMessage();
         }
     }
 

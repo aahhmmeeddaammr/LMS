@@ -136,9 +136,6 @@ public class CourseService {
             lesson.OTP = otp;
             lesson.course = course;
             course.getLessons().add(lesson);
-            courseRepository.save(course);
-            lessonRepository.save(lesson);
-
             course.getStudents().forEach(student -> {
                 Email email = new Email();
                 email.setRecipient(student.getEmail());
@@ -147,10 +144,12 @@ public class CourseService {
                 emailService.sendAddLessonEmail(course.getTitle() , email , lesson.title);
                 notificationService.sendNotificationToStudent(student, "A new lesson titled '" + lesson.title + "' has been added to the course: '" + course.getTitle() + "'.");
             });
+            courseRepository.save(course);
+            lessonRepository.save(lesson);
 
             return new GetResponse<>(200, "Lesson Added Successfully");
         } catch (Exception e) {
-            throw new Exception("Internal Server Error");
+            throw new Exception(e.getMessage());
         }
     }
 
@@ -167,7 +166,7 @@ public class CourseService {
             attendanceRepository.save(attendance);
             return new GetResponse<>(200, "Lesson Attended Successfully");
         } catch (Exception e) {
-            throw new Exception("Internal Server Error");
+            throw new Exception(e.getMessage());
         }
     }
 

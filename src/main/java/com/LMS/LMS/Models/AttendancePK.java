@@ -8,6 +8,8 @@ public class AttendancePK implements Serializable {
     private Student student;
     private Lesson lesson;
 
+    public AttendancePK(){}
+
     public AttendancePK(Student student, Lesson lesson) {
         this.student = student;
         this.lesson = lesson;

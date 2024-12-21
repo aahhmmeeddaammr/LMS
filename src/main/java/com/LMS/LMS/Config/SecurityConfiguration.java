@@ -49,6 +49,9 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/v1/auth/view-profile").authenticated()
                         .requestMatchers("/api/v1/notification/get-all-notifications").permitAll()
                         .requestMatchers("/api/v1/notification/get-unread-notifications").permitAll()
+                        .requestMatchers("/api/v1/performance/download-excel-report").permitAll()
+                        .requestMatchers("/api/v1/performance/charts/bar").permitAll()
+                        .requestMatchers("/api/v1/performance/charts/pie").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

@@ -2,7 +2,6 @@ package com.LMS.LMS.Services;
 
 import com.LMS.LMS.Helpers.FileHandler;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -23,7 +22,7 @@ public class UploadFileService {
             String fileUrl = BASE_URL + "/uploads/" + fileName.replace(" ", "%20");
             return fileUrl;
         } catch (IOException e) {
-        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }

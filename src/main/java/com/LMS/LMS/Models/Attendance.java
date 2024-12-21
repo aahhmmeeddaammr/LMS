@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 @Entity
 @IdClass(AttendancePK.class)
 public class Attendance {
+
     @Id
     @ManyToOne
     @JoinColumn(name = "student_id", nullable = false)
