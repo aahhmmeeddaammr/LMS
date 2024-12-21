@@ -31,6 +31,8 @@ class AssessmentServiceTest {
     @InjectMocks
     private AssessmentService assessmentService;
     @Mock
+    private NotificationService notificationService;
+    @Mock
     private QuestionRepository questionRepository;
     @Mock
     private AnswerRepository answerRepository;
@@ -66,11 +68,6 @@ class AssessmentServiceTest {
         Course course = new Course();
         course.setId(1);
         course.setTitle("Advanced Software");
-        List<Student> students = new ArrayList<>();
-        Student student = new Student();
-        student.setEmail("enas@mail.com");
-        students.add(student);
-        course.setStudents(students);
         when(courseRepository.findById(course.getId())).thenReturn(Optional.of(course));
 
         List<AddQuestionsParams> paramsList = new ArrayList<>();
@@ -88,7 +85,6 @@ class AssessmentServiceTest {
         verify(questionRepository, times(1)).save(any(Question.class));
         verify(answerRepository, times(1)).saveAll(questionParam.answers);
         verify(courseRepository, times(1)).save(course);
-        verify(emailService, times(1)).sendSimpleMail(any(Email.class));
     }
 
 
@@ -97,8 +93,8 @@ class AssessmentServiceTest {
         Course course = new Course();
         course.setId(1);
         course.setTitle("Advanced Software");
-        List<Student> students = new ArrayList<>();
         Student student = new Student();
+        List<Student> students = new ArrayList<>();
         student.setEmail("enas@mail.com");
         students.add(student);
         course.setStudents(students);
@@ -113,7 +109,6 @@ class AssessmentServiceTest {
         }
         course.setQuestionBank(questionBank);
 
-        when(courseRepository.findById(course.getId())).thenReturn(Optional.of(course));
         when(quizRepository.save(any(Quiz.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         AddQuizParams params = new AddQuizParams();
@@ -122,13 +117,14 @@ class AssessmentServiceTest {
         params.startDate = LocalDateTime.of(2024,12,20,8,30);
         params.score = 10;
         params.noOfQuestions = 10;
-        APIResponse response = assessmentService.createQuiz(params, course.getId());
 
+        APIResponse response = assessmentService.createQuiz(params, course.getId());
         assertNotNull(response);
         assertEquals(200, response.status);
         verify(courseRepository, times(1)).findById(course.getId());
         verify(quizRepository, times(1)).save(any(Quiz.class));
-        verify(emailService, times(1)).sendSimpleMail(any(Email.class));
+        verify(emailService, times(1)).sendAddQuizEmail(eq(course.getTitle()), any(Quiz.class), any(Email.class));
+        verify(notificationService, times(1)).sendNotificationToStudent(any(Student.class), any(String.class));
     }
 
     @Test
@@ -166,40 +162,45 @@ class AssessmentServiceTest {
 
     @Test
     void submitQuiz() {
+        Course course = new Course();
+        course.setId(1);
+        course.setTitle("Advanced Software");
         Quiz quiz = new Quiz();
         quiz.setId(1);
         quiz.setTitle("Quiz 2");
         quiz.setDuration(30);
         quiz.setScore(10);
         quiz.setStartDate(LocalDateTime.now().minusMinutes(10));
+        quiz.setCourse(course);
 
         List<Question> questions = new ArrayList<>();
         Question question = new Question();
         question.setId(1);
         question.setQuestionTitle("Question 1");
         Answer answer = new Answer();
+        answer.setId(1);
         answer.setIsCorrect(true);
         question.setAnswers(List.of(answer));
         questions.add(question);
         quiz.setQuestions(questions);
-
         Student student = new Student();
         student.setId(1);
-        student.setEmail("enas@mail.com");
-
         SubmitQuizParams params = new SubmitQuizParams();
-        params.answers = List.of("");
-
+        params.answers = List.of("1");
         when(quizRepository.findById(quiz.getId())).thenReturn(Optional.of(quiz));
         when(studentRepository.findById(student.getId())).thenReturn(Optional.of(student));
         when(studentQuizzesRepository.findById(any())).thenReturn(Optional.empty());
-        APIResponse response = assessmentService.submitQuiz(params, quiz.getId(), student.getId());
+        when(studentQuizzesRepository.save(any(StudentsQuizzes.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
+        APIResponse response = assessmentService.submitQuiz(params, quiz.getId(), student.getId());
         assertNotNull(response);
         assertEquals(200, response.status);
+        assertNotNull(response);
+        verify(quizRepository, times(1)).findById(quiz.getId());
+        verify(studentRepository, times(1)).findById(student.getId());
         verify(studentQuizzesRepository, times(1)).save(any(StudentsQuizzes.class));
-        verify(emailService, times(1)).sendSimpleMail(any(Email.class));
     }
+
 
 
     @Test
@@ -216,11 +217,6 @@ class AssessmentServiceTest {
         params.description = "Description for assignment 1";
         params.grade = 10;
 
-        List<Student> students = new ArrayList<>();
-        Student student = new Student();
-        student.setEmail("enas@mail.com");
-        students.add(student);
-        course.setStudents(students);
         APIResponse response = assessmentService.addAssignment(params, course.getId(), List.of(file));
 
         assertNotNull(response);
@@ -229,7 +225,6 @@ class AssessmentServiceTest {
         verify(assignmentRepository, times(1)).save(any(Assignment.class));
         verify(assignmentFileRepository, times(1)).save(any(AssignmentFile.class));
         verify(courseRepository, times(1)).save(course);
-        verify(emailService, times(1)).sendSimpleMail(any(Email.class));
         verify(uploadFileService, times(1)).uploadFile(file);
     }
     @Test
