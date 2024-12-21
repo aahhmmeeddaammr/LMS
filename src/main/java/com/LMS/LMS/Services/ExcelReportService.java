@@ -26,18 +26,17 @@ public class ExcelReportService {
         headerRow.createCell(4).setCellValue("Total Quiz Score");
         headerRow.createCell(5).setCellValue("Attendance Percentage");
 
-        // Fill data
         int rowIndex = 1;
         for (Map<String, Object> data : reportData) {
             Row row = sheet.createRow(rowIndex++);
-            row.createCell(0).setCellValue((Integer) data.get("studentId")); // Student Name
-            row.createCell(1).setCellValue((String) data.get("studentName")); // Student Name
-            row.createCell(2).setCellValue((String) data.get("courseName")); // Course Name
+            row.createCell(0).setCellValue((Integer) data.get("studentId"));
+            row.createCell(1).setCellValue((String) data.get("studentName"));
+            row.createCell(2).setCellValue((String) data.get("courseName"));
             row.createCell(3).setCellValue(data.get("averageAssignmentScore") == null ? 0 : (Double) data.get("averageAssignmentScore")); // Average Assignment Score
             row.createCell(4).setCellValue(data.get("averageQuizScore") == null ? 0 : (Double) data.get("averageQuizScore")); // Average Quiz Score
             row.createCell(5).setCellValue(data.get("attendancePercentage") == null ? 0 : (Double) data.get("attendancePercentage")); // Attendance Percentage
         }
-        // Write to output stream
+
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         workbook.write(outputStream);
         workbook.close();

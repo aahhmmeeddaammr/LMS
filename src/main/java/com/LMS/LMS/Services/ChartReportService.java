@@ -20,6 +20,7 @@ public class ChartReportService {
         for (Map<String, Object> data : reportData) {
             String courseName = (String) data.get("courseName");
             double AssignmentScore = data.get("averageAssignmentScore") == null ? 0 : (Double) data.get("averageAssignmentScore");
+            System.out.println(AssignmentScore);
             double QuizScore = data.get("averageQuizScore") == null ? 0 : (Double) data.get("averageQuizScore");
 
             dataset.addValue(AssignmentScore, "Assignment Score", courseName);

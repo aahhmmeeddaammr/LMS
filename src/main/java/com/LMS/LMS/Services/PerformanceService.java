@@ -95,4 +95,38 @@ public class PerformanceService {
 
         return reportData;
     }
+
+    public List<Map<String, Object>> generateChartReport() {
+        List<Course> courses = getAllCourses();
+        List<Map<String, Object>> reportData = new ArrayList<>();
+        for (Course course : courses) {
+            List<Student> students = getStudentsInCourse(course.getId());
+            double totalGradesOfAssignment = 0;
+            double totalGradesOfQuiz = 0;
+            for (Student student : students) {
+                List<StudentAssignment> assignments = getStudentAssignments(student.getId(), course.getId());
+                List<StudentsQuizzes> quizzes = getStudentQuizzes(student.getId(), course.getId());
+
+                totalGradesOfAssignment += (assignments != null && !assignments.isEmpty())
+                        ? assignments.stream()
+                        .mapToDouble(assignment -> Optional.of(assignment.getGrade()).orElse(0.0))
+                        .sum()
+                        : 0.0;
+
+                totalGradesOfQuiz += (quizzes != null && !quizzes.isEmpty())
+                        ? quizzes.stream()
+                        .mapToDouble(quiz -> Optional.of(quiz.getGrade()).orElse(0.0))
+                        .sum()
+                        : 0.0;
+            }
+
+            Map<String, Object> reportEntry = new HashMap<>();
+            reportEntry.put("courseName", course.getTitle() != null ? course.getTitle() : "Unknown");
+            reportEntry.put("averageAssignmentScore", totalGradesOfAssignment);
+            reportEntry.put("averageQuizScore", totalGradesOfQuiz);
+            reportData.add(reportEntry);
+        }
+
+        return reportData;
+    }
 }

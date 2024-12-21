@@ -42,7 +42,6 @@ public class PerformanceController {
                     .body(excelBytes);
 
         } catch (Exception e) {
-            // Log the error (optional: implement logging)
             return ResponseEntity.internalServerError()
                     .body(("Error generating Excel report: " + e.getMessage()).getBytes());
         }
@@ -50,7 +49,7 @@ public class PerformanceController {
 
     @GetMapping("charts/bar")
     public ResponseEntity<byte[]> downloadBarChart() throws IOException {
-        List<Map<String, Object>> reportData = performanceService.generatePerformanceReport();
+        List<Map<String, Object>> reportData = performanceService.generateChartReport();
         byte[] imageBytes = chartReportService.generateBarChartBytes(reportData);
 
         HttpHeaders headers = new HttpHeaders();
