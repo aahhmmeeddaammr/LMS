@@ -63,7 +63,7 @@ public class JwtService {
         if (expirationDate.before(new Date())) {
             throw new IllegalArgumentException("Expired Token: The token has already expired.");
         }
-        return false; // Token is valid, not expired
+        return false;
     }
 
     private Date ExtractExpristion(String token) {

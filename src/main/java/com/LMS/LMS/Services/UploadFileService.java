@@ -1,6 +1,7 @@
 package com.LMS.LMS.Services;
 
 import com.LMS.LMS.Helpers.FileHandler;
+import org.apache.poi.hpsf.GUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,7 +18,7 @@ public class UploadFileService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         try {
-            String fileName = file.getOriginalFilename();
+            String fileName = file.getOriginalFilename()+ GUID.class.toString();
             FileHandler.UploadFile(fileName, file.getBytes());
             String fileUrl = BASE_URL + "/uploads/" + fileName.replace(" ", "%20");
             return fileUrl;

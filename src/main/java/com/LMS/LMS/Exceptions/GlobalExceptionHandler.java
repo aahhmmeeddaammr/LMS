@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
+import java.io.EOFException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,6 +24,14 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler(IllegalAccessException.class)
     public ResponseEntity<Object> handleIllegalAccessException(IllegalAccessException ex, WebRequest request) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("error", ex.getMessage());
+        response.put("status", HttpStatus.UNAUTHORIZED.value());
+        response.put("timestamp", System.currentTimeMillis());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(EOFException.class)
+    public ResponseEntity<Object> handleIllegalAccessException(EOFException ex, WebRequest request) {
         Map<String, Object> response = new HashMap<>();
         response.put("error", ex.getMessage());
         response.put("status", HttpStatus.UNAUTHORIZED.value());

@@ -46,17 +46,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(auth);
                 } else {
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    response.getWriter().write("Invalid or expired JWT token");
+                    sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Invalid or expired JWT token");
                     return;
                 }
             }
         } catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Error processing JWT: " + e.getMessage());
+            sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Error processing JWT: " + e.getMessage());
             return;
         }
 
         filterChain.doFilter(request, response);
     }
+
+    private void sendErrorResponse(HttpServletResponse response, int status, String message) throws IOException {
+        response.setContentType("application/json");
+        response.setStatus(status);
+        response.getWriter().write(
+                String.format(
+                        "{\"timestamp\": \"%s\", \"status\": %d, \"error\": \"%s\"}",
+                        java.time.LocalDateTime.now().toString(),
+                        status,
+                        message
+                )
+        );
+    }
+
 }
