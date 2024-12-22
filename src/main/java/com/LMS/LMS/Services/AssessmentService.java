@@ -5,6 +5,7 @@ import com.LMS.LMS.Controllers.ApiResponses.GetResponse;
 import com.LMS.LMS.Controllers.ControllerParams.*;
 import com.LMS.LMS.DTOs.QuizDTO;
 import com.LMS.LMS.DTOs.StudentAssignmentDTO;
+import com.LMS.LMS.DTOs.StudentQuizDTO;
 import com.LMS.LMS.DTOs.SubmittedAssignmentFileDTO;
 import com.LMS.LMS.Models.*;
 import com.LMS.LMS.Repositories.*;
@@ -317,6 +318,24 @@ public class AssessmentService {
         notificationService.sendNotificationToStudent(student, "Assignment titled '" + assignment.getTitle() + "' is corrected successfully, your grade is " + param.grade);
 
         return new GetResponse<>(200, "Assignment Corrected Successfully");
+    }
+
+    public APIResponse getAllStudentsMarksInQuiz(int quizId) {
+        Quiz quiz = quizRepository.findById(quizId).orElse(null);
+        if (quiz == null) {
+            throw new IllegalArgumentException("Quiz not found");
+        }
+        List<StudentsQuizzes> studentsQuizzes = studentQuizzesRepository.findAllByQuizId(quiz.getId());
+        return new GetResponse<>(200, studentsQuizzes.stream().map(StudentQuizDTO::new).toList());
+    }
+
+    public APIResponse getAllQuizMarksForStudent(int studentId){
+        Student student = studentRepository.findById(studentId).orElse(null);
+        if (student == null) {
+            throw new IllegalArgumentException("Student not found");
+        }
+        List<StudentsQuizzes> quizzes = studentQuizzesRepository.findAllByStudentId(student.getId());
+        return new GetResponse<>(200, quizzes.stream().map(StudentQuizDTO::new).toList());
     }
 
     private List<Question> GenerateQuiz(int noOfQuestions, List<Question> questions) {

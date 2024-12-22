@@ -95,4 +95,12 @@ public class AssessmentController {
     public ResponseEntity<APIResponse> correctAssignment(@RequestBody CorrectAssignmentParams params) {
         return ResponseEntity.ok(assessmentService.correctAssignment(params));
     }
+    @GetMapping("/get-all-quiz-grades/{id}")
+    public ResponseEntity<APIResponse> getAllQuizGrades(@PathVariable int id){
+        return ResponseEntity.ok(assessmentService.getAllStudentsMarksInQuiz(id));
+    }
+    @GetMapping("/get-all-quizzes-for-student/{id}")
+    public ResponseEntity<APIResponse> getAllQuizzesForStudent(@PathVariable int id){
+        return ResponseEntity.ok(assessmentService.getAllQuizMarksForStudent(id));
+    }
 }

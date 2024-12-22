@@ -9,4 +9,5 @@ import java.util.List;
 public interface StudentQuizzesRepository extends JpaRepository<StudentsQuizzes, StudentsQuizzesPK> {
 
     List<StudentsQuizzes> findAllByStudentId(int studentId);
+    List<StudentsQuizzes> findAllByQuizId(int quizId);
 }

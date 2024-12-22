@@ -24,7 +24,7 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable) // Disable CSRF for stateless authentication
+        http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/api/v1/auth/register").permitAll()
@@ -52,6 +52,8 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/v1/performance/download-excel-report").permitAll()
                         .requestMatchers("/api/v1/performance/charts/bar").permitAll()
                         .requestMatchers("/api/v1/performance/charts/pie").permitAll()
+                        .requestMatchers("/api/v1/assessment/get-all-quiz-grades/{id}").permitAll()
+                        .requestMatchers("/api/v1/assessment/get-all-quizzes-for-student/{id}").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
