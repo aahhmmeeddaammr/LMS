@@ -15,11 +15,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -208,6 +205,7 @@ class AssessmentServiceTest {
         Course course = new Course();
         course.setId(1);
         course.setTitle("Advanced");
+        course.setStudents(new ArrayList<>());
         when(courseRepository.findById(course.getId())).thenReturn(java.util.Optional.of(course));
 
         MultipartFile file = new MockMultipartFile("file", "test.png", "text/plain", "".getBytes());
@@ -216,7 +214,6 @@ class AssessmentServiceTest {
         params.title = "Assignment 1";
         params.description = "Description for assignment 1";
         params.grade = 10;
-
         APIResponse response = assessmentService.addAssignment(params, course.getId(), List.of(file));
 
         assertNotNull(response);
