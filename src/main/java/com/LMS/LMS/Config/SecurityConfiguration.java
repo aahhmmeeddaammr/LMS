@@ -54,6 +54,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/v1/performance/charts/pie").permitAll()
                         .requestMatchers("/api/v1/assessment/get-all-quiz-grades/{id}").permitAll()
                         .requestMatchers("/api/v1/assessment/get-all-quizzes-for-student/{id}").permitAll()
+                        .requestMatchers("/api/v1/assessment/get-all-grades/{cid}/{sid}").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

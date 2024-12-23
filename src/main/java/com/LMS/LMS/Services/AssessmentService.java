@@ -3,10 +3,7 @@ package com.LMS.LMS.Services;
 import com.LMS.LMS.Controllers.ApiResponses.APIResponse;
 import com.LMS.LMS.Controllers.ApiResponses.GetResponse;
 import com.LMS.LMS.Controllers.ControllerParams.*;
-import com.LMS.LMS.DTOs.QuizDTO;
-import com.LMS.LMS.DTOs.StudentAssignmentDTO;
-import com.LMS.LMS.DTOs.StudentQuizDTO;
-import com.LMS.LMS.DTOs.SubmittedAssignmentFileDTO;
+import com.LMS.LMS.DTOs.*;
 import com.LMS.LMS.Models.*;
 import com.LMS.LMS.Repositories.*;
 import org.springframework.stereotype.Service;
@@ -238,6 +235,9 @@ public class AssessmentService {
         if (assignment == null) {
             throw new IllegalArgumentException("Assignment not found");
         }
+        if(!student.getCourses().contains(assignment.getCourse())){
+            throw new IllegalArgumentException("Student is not in this course");
+        }
         StudentAssignmentPK pk = new StudentAssignmentPK(student, assignment);
         StudentAssignment studentAssignment = studentAssignmentRepository.findById(pk).orElse(null);
         if (studentAssignment != null) {
@@ -327,6 +327,33 @@ public class AssessmentService {
         }
         List<StudentsQuizzes> studentsQuizzes = studentQuizzesRepository.findAllByQuizId(quiz.getId());
         return new GetResponse<>(200, studentsQuizzes.stream().map(StudentQuizDTO::new).toList());
+    }
+
+    public APIResponse getAllStudentMarksInCourse(int SId , int CourseId){
+        Student student = studentRepository.findById(SId).orElse(null);
+        if (student == null) {
+            throw new IllegalArgumentException("Student not found");
+        }
+        Course course = courseRepository.findById(CourseId).orElse(null);
+        if (course == null) {
+            throw new IllegalArgumentException("Course not found");
+        }
+        if(!course.getStudents().contains(student)){
+            throw new IllegalArgumentException("Student hasn't  assigned to this course");
+        }
+        List<StudentGradesDTO> gradesDTOS = new ArrayList<>();
+        for (Assignment assignment:course.getAssignments()){
+            StudentAssignmentPK assignmentPK = new StudentAssignmentPK(student,assignment);
+            StudentAssignment studentAssignment = studentAssignmentRepository.findById(assignmentPK).orElse(null);
+            if (! (studentAssignment == null)) {
+                gradesDTOS.add(new StudentGradesDTO(studentAssignment));
+            }
+        }
+        List<StudentsQuizzes> studentsQuizzes = studentQuizzesRepository.findAllByStudentId(student.getId());
+        for(StudentsQuizzes studentsQuiz:studentsQuizzes){
+            gradesDTOS.add(new StudentGradesDTO(studentsQuiz));
+        }
+        return new GetResponse<>(200, gradesDTOS);
     }
 
     public APIResponse getAllQuizMarksForStudent(int studentId){

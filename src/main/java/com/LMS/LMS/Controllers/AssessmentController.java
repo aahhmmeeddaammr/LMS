@@ -103,4 +103,8 @@ public class AssessmentController {
     public ResponseEntity<APIResponse> getAllQuizzesForStudent(@PathVariable int id){
         return ResponseEntity.ok(assessmentService.getAllQuizMarksForStudent(id));
     }
+    @GetMapping("/get-all-grades/{cid}/{sid}")
+    public ResponseEntity<APIResponse> getAllGrades(@PathVariable int cid, @PathVariable int sid) {
+        return ResponseEntity.ok(assessmentService.getAllStudentMarksInCourse(sid,cid));
+    }
 }

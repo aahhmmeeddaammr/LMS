@@ -7,11 +7,13 @@ public class StudentQuizDTO {
     public String quizName;
     public String studentName;
     public int studentId;
+    public double studentScore;
     public double quizScore;
     public StudentQuizDTO(StudentsQuizzes studentsQuizzes) {
         this.quizId=studentsQuizzes.getQuiz().getId();
         this.quizName=studentsQuizzes.getQuiz().getTitle();
-        this.quizScore=studentsQuizzes.getGrade();
+        this.studentScore=studentsQuizzes.getGrade();
+        this.quizScore = studentsQuizzes.getQuiz().getScore();
         this.studentName=studentsQuizzes.getStudent().getName();
         this.studentId=studentsQuizzes.getStudent().getId();
     }

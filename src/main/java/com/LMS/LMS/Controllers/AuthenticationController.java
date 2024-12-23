@@ -1,11 +1,9 @@
 package com.LMS.LMS.Controllers;
 
 import com.LMS.LMS.Controllers.ApiResponses.APIResponse;
-import com.LMS.LMS.Controllers.ApiResponses.GetResponse;
 import com.LMS.LMS.Controllers.ControllerParams.CompleteProfileParams;
 import com.LMS.LMS.Controllers.ControllerParams.LoginParams;
 import com.LMS.LMS.Controllers.ControllerParams.RegisterParams;
-import com.LMS.LMS.DTOs.ProfileDTO;
 import com.LMS.LMS.Services.AuthenticationService;
 import com.LMS.LMS.Services.JwtService;
 import org.springframework.http.ResponseEntity;
