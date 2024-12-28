@@ -11,6 +11,7 @@ import com.LMS.LMS.Repositories.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -52,7 +53,7 @@ public class CourseService {
 
 
 
-            return new GetResponse<>(200, course);
+            return new GetResponse<>(201, course);
         } catch (Exception e) {
             throw new IllegalArgumentException(e.getMessage());
         }
@@ -158,8 +159,11 @@ public class CourseService {
         if (lesson == null) {
             throw new IllegalArgumentException("Lesson not found or you have entered a wrong OTP");
         }
+        Student student = studentRepository.findById(StdId).orElse(null);
+        if(student!=null &&!student.getCourses().contains(lesson.course)){
+            throw new IllegalArgumentException("Student is not enrolled to this course");
+        }
         try {
-            Student student = studentRepository.findById(StdId).orElse(null);
             Attendance attendance = new Attendance();
             attendance.setStudent(student);
             attendance.setLesson(lesson);
@@ -194,6 +198,15 @@ public class CourseService {
         });
 
         return new GetResponse<>(200, new CourseDTO(course, false));
+    }
+
+    public APIResponse getAllLessonsInCourse(int CrsId){
+        Course course = courseRepository.findById(CrsId).orElse(null);
+        if (course == null) {
+            throw new IllegalArgumentException("Course not found");
+        }
+        List<Lesson> lessons = course.getLessons();
+        return new GetResponse<>(200, lessons);
     }
 
     private String GenerateOTP() {

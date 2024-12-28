@@ -27,7 +27,7 @@ public class SecurityConfiguration {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/uploads/**").permitAll()
-                        .requestMatchers("/api/v1/auth/register").hasRole("ROLE_ADMIN")
+                        .requestMatchers("/api/v1/auth/register").permitAll()
                         .requestMatchers("/api/v1/auth/login").permitAll()
                         .requestMatchers("/api/v1/course/add-course").hasRole("ROLE_Instructor")
                         .requestMatchers("/api/v1/course/add-lesson").hasRole("ROLE_Instructor")
@@ -36,6 +36,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/v1/course/add-material/**").hasRole("ROLE_Instructor")
                         .requestMatchers("/api/v1/assessment/submit-quiz/{id}").hasRole("ROLE_Student")
                         .requestMatchers("/api/v1/course/delete/{sid}/{cid}").hasRole("ROLE_Instructor")
+                        .requestMatchers("/api/v1/course/get-all-lesson/**").authenticated()
                         .requestMatchers("/api/v1/assessment/add-questions/{id}").hasRole("ROLE_Instructor")
                         .requestMatchers("/api/v1/assessment/generate-quiz/{id}").hasRole("ROLE_Instructor")
                         .requestMatchers("/api/v1/assessment/add-assignment/{id}").hasRole("ROLE_Instructor")

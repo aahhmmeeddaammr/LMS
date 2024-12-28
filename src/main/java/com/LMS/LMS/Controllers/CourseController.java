@@ -64,6 +64,10 @@ public class CourseController {
     public ResponseEntity<APIResponse> addLesson(@RequestBody AddLessonParams params) throws Exception {
         return ResponseEntity.ok(courseService.addLesson(params));
     }
+    @GetMapping("/get-all-lesson/{id}")
+    public ResponseEntity<APIResponse> getAllLesson(@PathVariable int id) throws Exception {
+        return ResponseEntity.ok(courseService.getAllLessonsInCourse(id));
+    }
 
     @PostMapping("/attend-lesson")
     public ResponseEntity<APIResponse> attendLesson(@RequestBody AttendLessonParams params, @RequestHeader String Authorization) throws Exception {

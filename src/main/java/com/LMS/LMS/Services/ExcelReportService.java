@@ -13,34 +13,91 @@ import java.util.Map;
 
 @Service
 public class ExcelReportService {
-    public byte[] generateExcelReport(List<Map<String, Object>> reportData) throws IOException {
+
+    public byte[] generateExcelReportForCourse(Map<String, Object> courseReportData) throws IOException {
         Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet("Performance Report");
+        createCourseSheet(workbook, courseReportData);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        workbook.write(outputStream);
+        workbook.close();
+        return outputStream.toByteArray();
+    }
 
-        // Create header
-        Row headerRow = sheet.createRow(0);
-        headerRow.createCell(0).setCellValue("Student Id");
-        headerRow.createCell(1).setCellValue("Student Name");
-        headerRow.createCell(2).setCellValue("Course Name");
-        headerRow.createCell(3).setCellValue("Total Assignment Score");
-        headerRow.createCell(4).setCellValue("Total Quiz Score");
-        headerRow.createCell(5).setCellValue("Attendance Percentage");
+    public byte[] generateExcelReportForAllCourses(List<Map<String, Object>> allCoursesReportData) throws IOException {
+        Workbook workbook = new XSSFWorkbook();
 
-        int rowIndex = 1;
-        for (Map<String, Object> data : reportData) {
-            Row row = sheet.createRow(rowIndex++);
-            row.createCell(0).setCellValue((Integer) data.get("studentId"));
-            row.createCell(1).setCellValue((String) data.get("studentName"));
-            row.createCell(2).setCellValue((String) data.get("courseName"));
-            row.createCell(3).setCellValue(data.get("averageAssignmentScore") == null ? 0 : (Double) data.get("averageAssignmentScore")); // Average Assignment Score
-            row.createCell(4).setCellValue(data.get("averageQuizScore") == null ? 0 : (Double) data.get("averageQuizScore")); // Average Quiz Score
-            row.createCell(5).setCellValue(data.get("attendancePercentage") == null ? 0 : (Double) data.get("attendancePercentage")); // Attendance Percentage
+        for (Map<String, Object> courseReportData : allCoursesReportData) {
+            createCourseSheet(workbook, courseReportData);
         }
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         workbook.write(outputStream);
         workbook.close();
-
         return outputStream.toByteArray();
+    }
+
+    private void createCourseSheet(Workbook workbook, Map<String, Object> courseReportData) {
+        String courseName = (String) courseReportData.get("courseName");
+        Sheet sheet = workbook.createSheet(courseName != null ? courseName : "Unknown Course");
+
+        List<Map<String, Object>> assignmentsInfo = (List<Map<String, Object>>) courseReportData.get("assignmentsInfo");
+        List<Map<String, Object>> quizzesInfo = (List<Map<String, Object>>) courseReportData.get("quizzesInfo");
+
+        // Create Header Row
+        Row headerRow = sheet.createRow(0);
+        int cellIndex = 0;
+        headerRow.createCell(cellIndex++).setCellValue("Student ID");
+        headerRow.createCell(cellIndex++).setCellValue("Student Name");
+        headerRow.createCell(cellIndex++).setCellValue("Attendance Percentage");
+
+        for (Map<String, Object> assignmentInfo : assignmentsInfo) {
+            Integer assignmentId = (Integer) assignmentInfo.get("id");
+            Double maxMarks = (Double) assignmentInfo.get("maxMarks");
+            headerRow.createCell(cellIndex++).setCellValue("Assignment " + assignmentId + " (" + maxMarks + ")");
+        }
+
+        for (Map<String, Object> quizInfo : quizzesInfo) {
+            Integer quizId = (Integer) quizInfo.get("id");
+            Double maxMarks = (Double) quizInfo.get("maxMarks");
+            headerRow.createCell(cellIndex++).setCellValue("Quiz " + quizId + " (" + maxMarks + ")");
+        }
+
+        headerRow.createCell(cellIndex++).setCellValue("Total Assignment Score");
+        headerRow.createCell(cellIndex++).setCellValue("Total Quiz Score");
+        headerRow.createCell(cellIndex++).setCellValue("Total Score");
+
+        List<Map<String, Object>> studentDataList = (List<Map<String, Object>>) courseReportData.get("students");
+        int rowIndex = 1;
+        for (Map<String, Object> studentData : studentDataList) {
+            Row row = sheet.createRow(rowIndex++);
+            cellIndex = 0;
+            row.createCell(cellIndex++).setCellValue((Integer) studentData.get("studentId"));
+            row.createCell(cellIndex++).setCellValue((String) studentData.get("studentName"));
+            row.createCell(cellIndex++).setCellValue((Double) studentData.get("attendancePercentage"));
+
+            Map<Integer, Double> assignmentGrades = (Map<Integer, Double>) studentData.get("assignmentGrades");
+            for (Map<String, Object> assignmentInfo : assignmentsInfo) {
+                Integer assignmentId = (Integer) assignmentInfo.get("id");
+                Double grade = assignmentGrades.get(assignmentId);
+                row.createCell(cellIndex++).setCellValue(grade != null ? grade : 0);
+            }
+
+            Map<Integer, Double> quizGrades = (Map<Integer, Double>) studentData.get("quizGrades");
+            for (Map<String, Object> quizInfo : quizzesInfo) {
+                Integer quizId = (Integer) quizInfo.get("id");
+                Double grade = quizGrades.get(quizId);
+                row.createCell(cellIndex++).setCellValue(grade != null ? grade : 0);
+            }
+
+            row.createCell(cellIndex++).setCellValue((Double) studentData.get("totalAssignmentScore"));
+            row.createCell(cellIndex++).setCellValue((Double) studentData.get("totalQuizScore"));
+            row.createCell(cellIndex++).setCellValue((Double) studentData.get("totalScore"));
+        }
+
+        // Auto-size columns for readability
+        int totalColumns = cellIndex;
+        for (int i = 0; i < totalColumns; i++) {
+            sheet.autoSizeColumn(i);
+        }
     }
 }

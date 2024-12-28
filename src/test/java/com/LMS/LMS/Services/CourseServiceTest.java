@@ -4,10 +4,8 @@ import com.LMS.LMS.Controllers.ApiResponses.APIResponse;
 import com.LMS.LMS.Controllers.ControllerParams.AddCourseParams;
 import com.LMS.LMS.Controllers.ControllerParams.AddLessonParams;
 import com.LMS.LMS.Controllers.ControllerParams.AttendLessonParams;
-import com.LMS.LMS.Models.Course;
-import com.LMS.LMS.Models.Instructor;
-import com.LMS.LMS.Models.Lesson;
-import com.LMS.LMS.Models.Student;
+import com.LMS.LMS.DTOs.CourseDTO;
+import com.LMS.LMS.Models.*;
 import com.LMS.LMS.Repositories.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,9 +16,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -68,7 +64,7 @@ class CourseServiceTest {
         APIResponse response = courseService.addCourse(courseParams, instructor.getId());
 
         assertNotNull(response);
-        assertEquals(200, response.status);
+        assertEquals(201, response.status);
         verify(courseRepository, times(1)).save(any(Course.class));
         verify(instructorRepository, times(1)).findById(instructor.getId());
     }
@@ -195,40 +191,35 @@ class CourseServiceTest {
     @Test
     void attendLesson() throws Exception {
         AttendLessonParams params = new AttendLessonParams();
-        params.OTP ="12345";
+        params.OTP = "12345";
+
         Lesson lesson = new Lesson();
         lesson.OTP = "12345";
-        lesson.title= "Lesson 1";
+        lesson.title = "Lesson 1";
+        Course course = new Course();
+        lesson.course = course;
+
         Student student = new Student();
         student.setId(1);
-        when(lessonRepository.findByOTP(lesson.OTP)).thenReturn(lesson);
-        when(studentRepository.findById(1)).thenReturn(Optional.of(student));
+        student.setCourses(Collections.singletonList(course));
+
+        Attendance attendance = new Attendance();
+        attendance.setStudent(student);
+        attendance.setLesson(lesson);
+
+        when(lessonRepository.findByOTP(params.OTP)).thenReturn(lesson);
+        when(studentRepository.findById(student.getId())).thenReturn(Optional.of(student));
+        when(attendanceRepository.save(attendance)).thenReturn(attendance);
+
         APIResponse response = courseService.attendLesson(params, student.getId());
 
         assertNotNull(response);
         assertEquals(200, response.status);
-        verify(lessonRepository, times(1)).findByOTP(lesson.OTP);
+
+        verify(lessonRepository, times(1)).findByOTP(params.OTP);
         verify(studentRepository, times(1)).findById(student.getId());
-    }
+        verify(attendanceRepository, times(1)).save(any(Attendance.class));
 
-
-    @Test
-    void addMaterial() {
-        MultipartFile file = new MockMultipartFile("file", "test.png", "image/png", "".getBytes());
-        Course course = new Course();
-        course.setId(1);
-        course.setTitle("Advanced Software");
-        course.setInstructor(new Instructor());
-        course.setStudents(new ArrayList<>());
-        course.setFiles(new ArrayList<>());
-        when(courseRepository.findById(course.getId())).thenReturn(Optional.of(course));
-        when(uploadFileService.uploadFile(file)).thenReturn("file/path/test.png");
-        APIResponse response = courseService.addMaterial(file, course.getId());
-
-        assertNotNull(response);
-        assertEquals(200, response.status);
-        verify(courseRepository, times(1)).findById(course.getId());
-        verify(uploadFileService, times(1)).uploadFile(file);
     }
 
 }

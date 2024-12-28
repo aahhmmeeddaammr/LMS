@@ -1,5 +1,6 @@
 package com.LMS.LMS.Models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.Date;
 
@@ -22,6 +23,7 @@ public class Lesson {
     @Column
     public String OTP;
 
+    @JsonIgnore
     @ManyToOne
     public Course course;
 }

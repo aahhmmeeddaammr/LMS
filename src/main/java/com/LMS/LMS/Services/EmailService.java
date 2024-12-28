@@ -77,6 +77,7 @@ public class EmailService {
          Map<String, String> placeholders = new HashMap<>();
          placeholders.put("assignmentTitle", assignmentName);
          placeholders.put("studentGrade", studentGrade.toString());
+         placeholders.put("studentName" , email.getRecipient().split("@")[0]);
          placeholders.put("feedback", feedback);
          placeholders.put("grade", studentGrade.toString());
          sendSimpleMail(email, placeholders, "/Templates/AssignmentGradeEmail.html");

@@ -86,7 +86,7 @@ public class AssessmentService {
 
 
 
-        return new GetResponse<>(200, "Questions Added Successfully");
+        return new GetResponse<>(201, "Questions Added Successfully");
     }
 
     public APIResponse createQuiz(AddQuizParams params, int CrsId) {
@@ -219,11 +219,10 @@ public class AssessmentService {
             email.setRecipient(student.getEmail());
             email.setSubject("New Assignment Added");
             email.setMsgBody("A new assignment titled '" + params.title + "' has been added to the course: " + course.getTitle());
-//            emailService.sendSimpleMail(email);
             notificationService.sendNotificationToStudent(student, "A new assignment titled '" + params.title + "' has been added to the '" + course.getTitle() + "' course.");
         }
 
-        return new GetResponse<>(200, "Assignment Added Successfully");
+        return new GetResponse<>(201, "Assignment Added Successfully");
     }
 
     public APIResponse submitAssignment(List<MultipartFile> files, int assignmentId, int studentId) {

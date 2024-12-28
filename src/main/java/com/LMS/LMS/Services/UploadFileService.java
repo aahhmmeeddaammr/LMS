@@ -18,7 +18,7 @@ public class UploadFileService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         try {
-            String fileName = file.getOriginalFilename()+ GUID.class.toString();
+            String fileName = new GUID()+"_"+file.getOriginalFilename();
             FileHandler.UploadFile(fileName, file.getBytes());
             String fileUrl = BASE_URL + "/uploads/" + fileName.replace(" ", "%20");
             return fileUrl;

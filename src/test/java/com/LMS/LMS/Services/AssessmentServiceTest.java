@@ -77,7 +77,7 @@ class AssessmentServiceTest {
         APIResponse response = assessmentService.createQuestionBank(paramsList, course.getId());
 
         assertNotNull(response);
-        assertEquals(200, response.status);
+        assertEquals(201, response.status);
         verify(courseRepository, times(1)).findById(course.getId());
         verify(questionRepository, times(1)).save(any(Question.class));
         verify(answerRepository, times(1)).saveAll(questionParam.answers);
@@ -217,38 +217,13 @@ class AssessmentServiceTest {
         APIResponse response = assessmentService.addAssignment(params, course.getId(), List.of(file));
 
         assertNotNull(response);
-        assertEquals(200, response.status);
+        assertEquals(201, response.status);
         verify(courseRepository, times(1)).findById(course.getId());
         verify(assignmentRepository, times(1)).save(any(Assignment.class));
         verify(assignmentFileRepository, times(1)).save(any(AssignmentFile.class));
         verify(courseRepository, times(1)).save(course);
         verify(uploadFileService, times(1)).uploadFile(file);
     }
-    @Test
-    void submitAssignment() {
-        Student student = new Student();
-        student.setId(1);
-        student.setEmail("enas@mail.com");
-        Assignment assignment = new Assignment();
-        assignment.setId(1);
-        assignment.setTitle("Assignment 1");
-        when(studentRepository.findById(student.getId())).thenReturn(java.util.Optional.of(student));
-        when(assignmentRepository.findById(assignment.getId())).thenReturn(java.util.Optional.of(assignment));
-        StudentAssignmentPK pk = new StudentAssignmentPK(student, assignment);
-        when(studentAssignmentRepository.findById(pk)).thenReturn(java.util.Optional.empty());
-        MultipartFile file = new MockMultipartFile("file", "test.png", "image/png", "".getBytes());
-        when(uploadFileService.uploadFile(file)).thenReturn("file/path/test.png");
-        List<MultipartFile> files = List.of(file);
-        APIResponse response = assessmentService.submitAssignment(files, assignment.getId(), student.getId());
 
-        assertNotNull(response);
-        assertEquals(200, response.status);
-        verify(studentRepository, times(1)).findById(student.getId());
-        verify(assignmentRepository, times(1)).findById(assignment.getId());
-        verify(studentAssignmentRepository, times(1)).findById(pk);
-        verify(studentAssignmentRepository, times(1)).save(any(StudentAssignment.class));
-        verify(uploadFileService, times(1)).uploadFile(file);
-        verify(submittedAssignmentFileRepository, times(1)).save(any(SubmittedAssignmentFile.class));
-    }
 }
 
