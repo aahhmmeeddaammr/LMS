@@ -1,32 +1,24 @@
-# Use Maven image with JDK 17 for building
+# Use a valid Maven image with OpenJDK 17
 FROM maven:3.8.5-openjdk-17 AS build
 
-# Set working directory
+# Set working directory inside the container
 WORKDIR /app
 
-# Copy pom.xml and download dependencies first (to cache this layer)
-COPY pom.xml .
-
-# Download dependencies
-RUN mvn dependency:go-offline
-
-# Copy the rest of the project
+# Copy all project files
 COPY . .
 
-# Build the application (skip tests for speed)
+# Build the application
 RUN mvn clean package -DskipTests
 
-# Use a lightweight OpenJDK image for runtime
+# Use a stable OpenJDK runtime image
 FROM openjdk:17-jdk-slim
-
-# Set workdir
 WORKDIR /app
 
-# Copy the built jar from the previous stage
-COPY --from=build /app/target/LMS-0.0.1-SNAPSHOT.jar app.jar
+# Copy the built JAR from the previous stage
+COPY --from=build /app/target/LMS-0.0.1-SNAPSHOT.jar LMS.jar
 
-# Expose the app port
+# Expose the application port
 EXPOSE 8080
 
-# Run the app
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Run the Spring Boot application
+ENTRYPOINT ["java", "-jar", "LMS.jar"]
